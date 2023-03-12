@@ -1,3 +1,5 @@
+main
+
 # Prerequisites
 *.d
 
@@ -34,3 +36,4 @@
 # misc
 *.zip
 .DS_Store
+.vscode
