@@ -1,17 +1,27 @@
 CC = g++
 CFLAGS = -std=c++11 -c -Wall -pedantic -g
+# input parameters - taken from project.pdf
+INP_FILE_NAME="prog.dat"
+NF=4 # number of instructions fetched per cycle by the fetch unit
+NI=16 # instuction queue max capacity of instructions held in the decode unit
+NW=4 # number of instructions issued per cycle to reservation stations
+NR=16 # number of entries available in the circular reorder buffer (ROB)
+NB=4 # number of common data buses
 
-all: clean main run
-
+all: main
+debug:
+	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NR) $(NB) 1
 run: 
-	./main
+	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NR) $(NB)
 
-main: main.o
-	$(CC) -o main main.o
+main: main.o simulator.o
+	$(CC) -o main main.o simulator.o
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
 
+simulator.o: simulator.cpp
+	$(CC) $(CFLAGS) simulator.cpp
+
 clean: 
-	rm *.o
-	rm main
+	rm *.o main
