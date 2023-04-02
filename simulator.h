@@ -3,6 +3,7 @@
 #include <deque>
 #include <unordered_map>
 #include <vector>
+#include "fetch.h"
 
 using namespace std;
 
@@ -41,12 +42,17 @@ class Simulator {
         unordered_map<int, double> memories;
         deque<Instruction> instructions;
         unordered_map<string, int> branchLabelsTable;
+        int address = 0;
+        int cycleCount = 0;
+        int programCounter = 0;
+        unordered_map<int, pair<int, int>> btb;
         // unordered_map<string, string> mappingTable;
         // deque<string> freeList;
         // int physicalRegs[REGISTER_COUNT];
 
     public:
-        int address = 0;
+        // stages
+        Fetch * fetch;
         void tokenizeMemory(char * inpStr);
         void tokenizeInstruction(char * inpStr);
         bool readInputFile(const char * inpFile);
@@ -67,6 +73,15 @@ class Simulator {
             for(const auto& elem : branchLabelsTable) {
                 cout << elem.first << " " << elem.second << "\n";
             }
+        }
+        void printCurrentAddress() {
+            cout << "\nAddress = " << address << "\n";
+        }
+        void printCurrentCycleCount() {
+            cout << "\ncycleCount = " << cycleCount << "\n";
+        }
+        void tickCycleCount() {
+            cycleCount++;
         }
         Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr);
         Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr, bool debugMode);

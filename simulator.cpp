@@ -285,6 +285,7 @@ Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr)
     this->nb = nb;
     this->nr = nr;
     readInputFile(inpFileName.c_str());
+    this->fetch = new Fetch();
 }
 
 Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr, bool debugMode) {
@@ -295,6 +296,7 @@ Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr,
     this->nb = nb;
     this->nr = nr;
     readInputFile(inpFileName.c_str());
+    this->fetch = new Fetch();
 }
 
 Simulator::~Simulator() {}
