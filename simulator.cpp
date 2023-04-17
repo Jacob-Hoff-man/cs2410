@@ -25,56 +25,8 @@ bool isBranchLabel(const string inpString) {
     return inpString[inpString.size() - 1] == ':';
 }
 
-string toUpper(string inpString) {
-    string temp = inpString;
-    transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
-    return temp;
-}
-
-InstructionType getInstructionTypeFromString(const string inpString) {
-    if (inpString == "FLD") return InstructionType::FLD;
-    else if (inpString == "FSD") return InstructionType::FSD;
-    else if (inpString == "ADD") return InstructionType::ADD;
-    else if (inpString =="ADDI") return InstructionType::ADDI;
-    else if (inpString =="SLT") return InstructionType::SLT;
-    else if (inpString =="FADD") return InstructionType::FADD;
-    else if (inpString =="FSUB") return InstructionType::FSUB;
-    else if (inpString =="FMUL") return InstructionType::FMUL;
-    else if (inpString =="FDIV") return InstructionType::FDIV;
-    else if (inpString =="BNE") return InstructionType::BNE;
-};
-
-string getStringFromInstructionType(const InstructionType inpInstrType) {
-    switch (inpInstrType) {
-        case InstructionType::FLD: return "FLD";
-        case InstructionType::FSD: return "FLD";
-        case InstructionType::ADD: return "ADD";
-        case InstructionType::ADDI: return "ADDI";
-        case InstructionType::SLT: return "SLT";
-        case InstructionType::FADD: return "FADD";
-        case InstructionType::FSUB: return "FSUB";
-        case InstructionType::FMUL: return "FMUL";
-        case InstructionType::FDIV: return "FDIV";
-        case InstructionType::BNE: return "BNE";
-        default: return "";
-    }
-};
-
-void Simulator::printInstruction(Instruction inpInstr) {
-    cout << "\nInstruction {" <<
-        "\n     address=" << inpInstr.address <<
-        "\n     opcode=" << getStringFromInstructionType(inpInstr.opcode) << " (" << inpInstr.opcode << ")" <<
-        "\n     rd=" << inpInstr.rd <<
-        "\n     rs=" << inpInstr.rs <<
-        "\n     rt=" << inpInstr.rt <<
-        "\n     immediate=" << inpInstr.immediate <<
-        "\n}\n";
-}
-
-void Simulator::printInstructions() {
-    for(int i = 0; i < instructions.size(); i++) {
-        printInstruction(instructions[i]);
-    }
+void Simulator::printSimulatorInstructions() {
+    printInstructions(instructions);
 }
 
 void Simulator::tokenizeMemory(char * inpStr) {
@@ -278,17 +230,28 @@ bool Simulator::readInputFile(const char * inpFile) {
     return true;
 }
 
-Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr) {
-    this->nf = nf;
-    this->ni = ni;
-    this->nw = nw;
-    this->nb = nb;
-    this->nr = nr;
-    readInputFile(inpFileName.c_str());
-    this->fetch = new Fetch();
+void Simulator::cyclePipeline() {
+    // run stages backwards
+    f->dispatch();
+    tickCycleCount();
+}
+
+void Simulator::execute(int inpCycleCount) {
+    deque<Instruction> out;
+    for (int i = 0; i < inpCycleCount; i++) {
+        cyclePipeline();
+        printInstruction(this->f->instr);
+        printCurrentCycleCount();
+        // building a test output
+        out.push_back(f->instr);
+    }
+    cout <<"\n OUTPUT OF SIM EXEC\n";
+    printCurrentCycleCount();
+    printInstructions(out);
 }
 
 Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr, bool debugMode) {
+    // init
     this->debugMode = debugMode;
     this->nf = nf;
     this->ni = ni;
@@ -296,7 +259,8 @@ Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr,
     this->nb = nb;
     this->nr = nr;
     readInputFile(inpFileName.c_str());
-    this->fetch = new Fetch();
+    this->f = new Fetch(&instructions);
+    this->execute(10);
 }
 
 Simulator::~Simulator() {}

@@ -1,13 +1,18 @@
+#include <deque>
+
 #ifndef H_FETCH
 #define H_FETCH
 
 #include "stage.h"
+#include "common.h"
 
 class Fetch: public Stage {
     private:
     public:
+        Instruction instr;
+        deque<Instruction> * instructions;
         bool dispatch();
-    Fetch();
+    Fetch(deque<Instruction> * instructions);
     ~Fetch();
 };
 

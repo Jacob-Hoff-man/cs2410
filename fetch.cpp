@@ -1,11 +1,14 @@
 #include "fetch.h"
 
-Fetch::Fetch() {
+Fetch::Fetch(deque<Instruction> * instructions) {
     stageType = StageType::FETCH;
+    this->instructions = instructions;
     printStageType();
 };
 
 bool Fetch::dispatch() {
-    return false;
+    this->instr = this->instructions->front();
+    this->instructions->pop_front();
+    return true;
 }
 

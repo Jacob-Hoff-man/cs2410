@@ -3,36 +3,13 @@
 #include <deque>
 #include <unordered_map>
 #include <vector>
+#include "common.h"
 #include "fetch.h"
-
-using namespace std;
 
 #ifndef H_SIM
 #define H_SIM
 
 #define REGISTER_COUNT 32 // # of physical registers
-
-enum InstructionType {
-    FLD,
-    FSD,
-    ADD,
-    ADDI,
-    SLT,
-    FADD,
-    FSUB,
-    FMUL,
-    FDIV,
-    BNE
-};
-
-struct Instruction {
-    int address;
-    InstructionType opcode;
-    string rd;
-    string rs;
-    string rt;
-    int immediate;
-};
 
 class Simulator {
     private:
@@ -40,7 +17,6 @@ class Simulator {
         string inpFileName = "";
         int nf, ni, nw, nb, nr;
         unordered_map<int, double> memories;
-        deque<Instruction> instructions;
         unordered_map<string, int> branchLabelsTable;
         int address = 0;
         int cycleCount = 0;
@@ -51,8 +27,9 @@ class Simulator {
         // int physicalRegs[REGISTER_COUNT];
 
     public:
+        deque<Instruction> instructions;
         // stages
-        Fetch * fetch;
+        Fetch * f;
         void tokenizeMemory(char * inpStr);
         void tokenizeInstruction(char * inpStr);
         bool readInputFile(const char * inpFile);
@@ -67,8 +44,7 @@ class Simulator {
                 cout << elem.first << " " << elem.second << "\n";
             }
         }
-        void printInstruction(Instruction inpInstr);
-        void printInstructions();
+        void printSimulatorInstructions();
         void printBranchLabelsTable() {
             for(const auto& elem : branchLabelsTable) {
                 cout << elem.first << " " << elem.second << "\n";
@@ -83,7 +59,8 @@ class Simulator {
         void tickCycleCount() {
             cycleCount++;
         }
-        Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr);
+        void cyclePipeline();
+        void execute(int inpCycleCount);
         Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr, bool debugMode);
         ~Simulator(); 
 };
