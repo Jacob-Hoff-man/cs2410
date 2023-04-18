@@ -21,14 +21,14 @@ class Simulator {
         int address = 0;
         int cycleCount = 0;
         int programCounter = 0;
+        deque<Instruction> instructions;
+        deque<Instruction> instructionQueue;
+        unordered_map<int, pair<int, int>> btb;
         // unordered_map<string, string> mappingTable;
         // deque<string> freeList;
         // int physicalRegs[REGISTER_COUNT];
 
     public:
-        deque<Instruction> instructions;
-        deque<Instruction> instructionQueue;
-        unordered_map<int, pair<int, int>> btb;
         // stages
         Fetch * f;
         void tokenizeMemory(char * inpStr);
