@@ -29,6 +29,10 @@ void Simulator::printSimulatorInstructions() {
     printInstructions(instructions);
 }
 
+void Simulator::printSimulatorInstructionQueue() {
+    printInstructions(instructionQueue);
+}
+
 void Simulator::tokenizeMemory(char * inpStr) {
     vector<char *> words;
     int location, value;
@@ -237,20 +241,28 @@ void Simulator::cyclePipeline() {
 }
 
 void Simulator::execute(int inpCycleCount) {
-    deque<Instruction> out;
-    for (int i = 0; i < inpCycleCount; i++) {
+    while(!instructions.empty()) {
+        printSimulatorCurrentCycleCount();
+        printSimulatorBtbMap();
+        //printSimulatorInstructionQueue();
         cyclePipeline();
-        printInstruction(this->f->instr);
-        printCurrentCycleCount();
-        // building a test output
-        out.push_back(f->instr);
     }
-    cout <<"\n OUTPUT OF SIM EXEC\n";
-    printCurrentCycleCount();
-    printInstructions(out);
+    cout << "\nran out of instructions\n";
+    cout << "\nprinting instructions cache\n";
+    printSimulatorInstructions();
+    cout << "\nprinting instructions queue\n";
+    printSimulatorInstructionQueue();
 }
 
-Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr, bool debugMode) {
+Simulator::Simulator(
+    string inpFileName,
+    int nf,
+    int ni,
+    int nw,
+    int nb,
+    int nr,
+    bool debugMode
+) {
     // init
     this->debugMode = debugMode;
     this->nf = nf;
@@ -259,7 +271,8 @@ Simulator::Simulator(string inpFileName, int nf, int ni, int nw, int nb, int nr,
     this->nb = nb;
     this->nr = nr;
     readInputFile(inpFileName.c_str());
-    this->f = new Fetch(&instructions);
+    // init pipeline stages
+    this->f = new Fetch(instructions, instructionQueue, nf, ni, programCounter, btb);
     this->execute(10);
 }
 

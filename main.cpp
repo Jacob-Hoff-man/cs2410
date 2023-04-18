@@ -47,10 +47,7 @@ int main(int argc, char *argv[])
         simulator->printSimulatorInstructions();
         cout << "\nsimulator memories length = " << simulator->getMemoriesSize() << "\n";
         cout << "\nsimulator instructions length = " << simulator->getInstructionsSize() << "\n";
-        cout << "\nPRINT INIT BRANCHLABELSTABLE\n";
-        simulator->printBranchLabelsTable();
-        simulator->tickCycleCount();
-        simulator->printCurrentCycleCount();
+
     } else {
         cout << "invalid input parameters.\n    usage= ./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NR) $(NB)\n";
     }

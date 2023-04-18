@@ -21,7 +21,7 @@ class Stage {
         void printStageType() {
             cout << "printing StageType = " << stageType << "\n";
         }
-        bool dispatch();
+        void dispatch();
 };
 
 #endif
