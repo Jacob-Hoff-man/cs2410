@@ -5,6 +5,7 @@
 #include <vector>
 #include "common.h"
 #include "fetch.h"
+#include "decode.h"
 
 #ifndef H_SIM
 #define H_SIM
@@ -22,8 +23,9 @@ class Simulator {
         int cycleCount = 0;
         int programCounter = 0;
         deque<Instruction> instructions;
-        deque<Instruction> instructionQueue;
+        deque<Instruction> fInstructionQueue;
         unordered_map<int, pair<int, int>> btb;
+        deque<Instruction> dInstructionQueue;
         // unordered_map<string, string> mappingTable;
         // deque<string> freeList;
         // int physicalRegs[REGISTER_COUNT];
@@ -31,6 +33,7 @@ class Simulator {
     public:
         // stages
         Fetch * f;
+        Decode * d;
         void tokenizeMemory(char * inpStr);
         void tokenizeInstruction(char * inpStr);
         bool readInputFile(const char * inpFile);
@@ -57,7 +60,7 @@ class Simulator {
         void printSimulatorCurrentCycleCount() {
             cout << "\ncycleCount = " << cycleCount << "\n";
         }
-        void printSimulatorInstructionQueue();
+        void printSimulatorFetchInstructionQueue();
         void printSimulatorBtbMap() {
             for(auto & kv : btb) {
                 cout << "\naddress = " << kv.first << 

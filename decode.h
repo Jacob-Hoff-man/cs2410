@@ -1,29 +1,29 @@
 #include <deque>
 #include <unordered_map>
 
-#ifndef H_FETCH
-#define H_FETCH
+#ifndef H_DECODE
+#define H_DECODE
 
 #include "stage.h"
 #include "common.h"
 
-class Fetch: public Stage {
+class Decode: public Stage {
     private:
     public:
-        deque<Instruction> & instructions;
         deque<Instruction> & fInstructionQueue;
-        int & programCounter;
         unordered_map<int, pair<int, int>> & btb;
+        deque<Instruction> & dInstructionQueue;
         int & nf;
+        int & ni;
         void dispatch();
-    Fetch(
-        deque<Instruction> & instructions,
+    Decode(
         deque<Instruction> & fInstructionQueue,
-        int & programCounter,
         unordered_map<int, pair<int, int>> & btb,
-        int & nf
+        deque<Instruction> & dInstructionQueue,
+        int & nf,
+        int & ni
     );
-    ~Fetch();
+    ~Decode();
 };
 
 #endif

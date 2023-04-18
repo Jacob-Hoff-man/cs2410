@@ -2,42 +2,38 @@
 
 Fetch::Fetch(
     deque<Instruction> & instructions,
-    deque<Instruction> & instructionQueue,
-    int & nf,
-    int & ni,
+    deque<Instruction> & fInstructionQueue,
     int & programCounter,
-    unordered_map<int, pair<int, int>> & btb
+    unordered_map<int, pair<int, int>> & btb,
+    int & nf
 ) :
     instructions(instructions),
-    instructionQueue(instructionQueue),
-    nf(nf),
-    ni(ni),
+    fInstructionQueue(fInstructionQueue),
     programCounter(programCounter),
-    btb(btb)
+    btb(btb),
+    nf(nf)
 {
     this->stageType = StageType::FETCH;
     this->instructions = instructions;
-    this->nf = nf;
-    this->ni = ni;
     this->programCounter = programCounter;
-    this->instructionQueue = instructionQueue;
+    this->fInstructionQueue = fInstructionQueue;
     this->btb = btb;
+    this->nf = nf;
     printStageType();
     cout << "NF in Fetch stage = " << nf;
-    cout << "NI in Fetch stage = " << ni;
 };
 
 void Fetch::dispatch() {
-    cout << "f_dispatch called=";
+    cout << "\nf_dispatch called=\n";
     for (int i = 0; i < nf; i++) {
-        if (instructions.empty() || instructionQueue.size() >= ni) {
-            // either no instructions available, or instructionQueue is full
+        if (instructions.empty() || fInstructionQueue.size() >= nf) {
+            // either no instructions available, or fInstructionQueue is full
             // stall
             return;
         } else {
             Instruction iInstr = this->instructions.front();
             this->instructions.pop_front();
-            instructionQueue.push_back(iInstr);
+            fInstructionQueue.push_back(iInstr);
             if ((iInstr.opcode == InstructionType::BNE) && (btb.count(iInstr.address))) {
                 if (btb.find(iInstr.address) != btb.end()) {
                     // address exists in btb

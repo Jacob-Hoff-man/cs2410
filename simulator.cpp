@@ -29,8 +29,8 @@ void Simulator::printSimulatorInstructions() {
     printInstructions(instructions);
 }
 
-void Simulator::printSimulatorInstructionQueue() {
-    printInstructions(instructionQueue);
+void Simulator::printSimulatorFetchInstructionQueue() {
+    printInstructions(fInstructionQueue);
 }
 
 void Simulator::tokenizeMemory(char * inpStr) {
@@ -236,6 +236,7 @@ bool Simulator::readInputFile(const char * inpFile) {
 
 void Simulator::cyclePipeline() {
     // run stages backwards
+    d->dispatch();
     f->dispatch();
     tickCycleCount();
 }
@@ -251,7 +252,7 @@ void Simulator::execute(int inpCycleCount) {
     cout << "\nprinting instructions cache\n";
     printSimulatorInstructions();
     cout << "\nprinting instructions queue\n";
-    printSimulatorInstructionQueue();
+    printSimulatorFetchInstructionQueue();
 }
 
 Simulator::Simulator(
@@ -272,7 +273,9 @@ Simulator::Simulator(
     this->nr = nr;
     readInputFile(inpFileName.c_str());
     // init pipeline stages
-    this->f = new Fetch(instructions, instructionQueue, nf, ni, programCounter, btb);
+    this->f = new Fetch(instructions, fInstructionQueue, programCounter, btb, nf);
+    this->d = new Decode(fInstructionQueue, btb, dInstructionQueue, nf, ni);
+    // test run
     this->execute(10);
 }
 
