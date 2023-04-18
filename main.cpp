@@ -4,6 +4,8 @@
 #include <vector>
 //
 #include "simulator.h"
+#include "fetch.h"
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -16,8 +18,7 @@ int main(int argc, char *argv[])
         int nw = stoi(argv[4]);
         int nb = stoi(argv[5]);
         int nr = stoi(argv[6]);
-
-        Simulator * simulator = new Simulator(inpFileName, nf, ni, nw, nb, nr);
+        Simulator * simulator = new Simulator(inpFileName, nf, ni, nw, nb, nr, false);
 
     } else if (argc == 8) {
         // debug mode enabled
@@ -43,11 +44,10 @@ int main(int argc, char *argv[])
         cout << "\nPRINT INIT MEMORIES\n";
         simulator->printMemories();
         cout << "\nPRINT INIT INSTRUCTIONS\n";
-        simulator->printInstructions();
+        simulator->printSimulatorInstructions();
         cout << "\nsimulator memories length = " << simulator->getMemoriesSize() << "\n";
         cout << "\nsimulator instructions length = " << simulator->getInstructionsSize() << "\n";
-        cout << "\nPRINT INIT BRANCHLABELSTABLE\n";
-        simulator->printBranchLabelsTable();
+
     } else {
         cout << "invalid input parameters.\n    usage= ./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NR) $(NB)\n";
     }
