@@ -25,12 +25,37 @@ bool isBranchLabel(const string inpString) {
     return inpString[inpString.size() - 1] == ':';
 }
 
+void Simulator::initSimulatorPhysicalRegs() {
+    for (int i = 0; i < REGISTER_COUNT; i++) {
+        
+        string physicalName = "p" + to_string(i);
+        // init physical reg and status
+        // initialize all to zero
+        physicalRegs[physicalName] = 0;
+        // init free list
+        freeList.push_back(physicalName);
+    }
+    // init mappingTable
+    mappingTable = unordered_map<string, string>();
+    // init mappingTable history
+    mappingTableHistory= deque<unordered_map<string, string>>();
+    // init freeList history
+    freeListHistory = deque<deque<string>>();
+}
+
 void Simulator::printSimulatorInstructions() {
+    cout << "INSTRUCTIONS CACHE\n";
     printInstructions(instructions);
 }
 
 void Simulator::printSimulatorFetchInstructionQueue() {
+    cout << "FETCH INSTRUCTION QUEUE\n";
     printInstructions(fInstructionQueue);
+}
+
+void Simulator::printSimulatorDecodeInstructionQueue() {
+    cout << "DECODE INSTRUCTION QUEUE\n";
+    printInstructions(dInstructionQueue);
 }
 
 void Simulator::tokenizeMemory(char * inpStr) {
@@ -241,18 +266,21 @@ void Simulator::cyclePipeline() {
     tickCycleCount();
 }
 
-void Simulator::execute(int inpCycleCount) {
-    while(!instructions.empty()) {
-        printSimulatorCurrentCycleCount();
-        printSimulatorBtbMap();
-        //printSimulatorInstructionQueue();
+void Simulator::execute() {
+    while(programCounter <= instructions.size()-1 || !fInstructionQueue.empty()) {
+        //printSimulatorCurrentCycleCount();
+        //printSimulatorBtbMap();
+        //printSimulatorFetchInstructionQueue();
         cyclePipeline();
     }
-    cout << "\nran out of instructions\n";
-    cout << "\nprinting instructions cache\n";
-    printSimulatorInstructions();
-    cout << "\nprinting instructions queue\n";
-    printSimulatorFetchInstructionQueue();
+    cout << "\nrdone\n";
+    printSimulatorDecodeInstructionQueue();
+    printSimulatorBranchLabelsTable();
+    printSimulatorBtbMap();
+    printSimulatorMappingTable();
+    printSimulatorFreeList();
+    printSimulatorMappingTableHistory();
+    printSimulatorFreeListHistory();
 }
 
 Simulator::Simulator(
@@ -272,11 +300,29 @@ Simulator::Simulator(
     this->nb = nb;
     this->nr = nr;
     readInputFile(inpFileName.c_str());
+    initSimulatorPhysicalRegs();
     // init pipeline stages
-    this->f = new Fetch(instructions, fInstructionQueue, programCounter, btb, nf);
-    this->d = new Decode(fInstructionQueue, btb, dInstructionQueue, nf, ni);
+    this->f = new Fetch(
+        instructions,
+        fInstructionQueue,
+        programCounter,
+        btb,
+        nf
+    );
+    this->d = new Decode(
+        fInstructionQueue,
+        btb,
+        dInstructionQueue,
+        mappingTable,
+        freeList,
+        mappingTableHistory,
+        freeListHistory,
+        branchLabelsTable,
+        nf,
+        ni
+    );
     // test run
-    this->execute(10);
+    this->execute();
 }
 
 Simulator::~Simulator() {}

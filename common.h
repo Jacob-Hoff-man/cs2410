@@ -79,4 +79,36 @@ static void printInstructions(deque<Instruction> inpInstrs) {
     }
 }
 
+static bool containsOffset(const string inpString) {
+    int pos1 = inpString.find("(");
+    int pos2 = inpString.find(")");
+    return (pos1 != -1 && pos2 != -1);
+}
+
+static int getOffset(const string inpString) {
+    int offset = 0;
+    int pos1 = inpString.find("(");
+    if (pos1 != -1) {
+        string offsetStr = inpString.substr(0, pos1);
+        offset = stoi(offsetStr);
+        return offset;
+    }
+    return offset;
+}
+
+static string trimOffset(const string inpString) {
+    string newStr = inpString;
+    int pos1 = inpString.find("(");
+    int pos2 = inpString.find(")");
+    if (pos1 != -1 && pos2 != -1) {
+        newStr = inpString.substr(pos1 + 1, pos2-pos1-1);
+        return newStr;
+    }
+    return newStr;
+}
+
+static string appendOffset(const string inpString, const int offset) {
+    return to_string(offset) + "(" + inpString + ")";
+}
+
 #endif

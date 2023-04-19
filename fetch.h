@@ -15,7 +15,7 @@ class Fetch: public Stage {
         int & programCounter;
         unordered_map<int, pair<int, int>> & btb;
         int & nf;
-        void dispatch();
+        bool dispatch();
     Fetch(
         deque<Instruction> & instructions,
         deque<Instruction> & fInstructionQueue,
