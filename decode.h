@@ -13,7 +13,6 @@
 class Decode: public Stage {
     private:
         string performRegisterRenaming(string inpRegName, bool isDestinationReg);
-    public:
         deque<Instruction> & fInstructionQueue;
         unordered_map<int, pair<int, int>> & btb;
         deque<Instruction> & dInstructionQueue;
@@ -24,6 +23,7 @@ class Decode: public Stage {
         unordered_map<string, int> & branchLabelsTable;
         int & nf;
         int & ni;
+    public:
         bool dispatch();
     Decode(
         deque<Instruction> & fInstructionQueue,

@@ -9,12 +9,12 @@
 
 class Fetch: public Stage {
     private:
-    public:
         deque<Instruction> & instructions;
         deque<Instruction> & fInstructionQueue;
         int & programCounter;
         unordered_map<int, pair<int, int>> & btb;
         int & nf;
+    public:
         bool dispatch();
     Fetch(
         deque<Instruction> & instructions,
