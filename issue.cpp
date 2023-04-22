@@ -27,8 +27,6 @@ Issue::Issue(
 {
     this->stageType = StageType::ISSUE;
     this->dInstructionQueue = dInstructionQueue;
-    this->nw = nw;
-    this->nr = nr;
     this->rsUnitInt = rsUnitInt;
     this->rsUnitLoad = rsUnitLoad;
     this->rsUnitStore = rsUnitStore;
@@ -37,9 +35,12 @@ Issue::Issue(
     this->rsUnitFpDiv = rsUnitFpDiv;
     this->rsUnitBu = rsUnitBu;
     this-> rob = rob;
+    this->nw = nw;
+    this->nr = nr;
 
     printStageType();
     cout << "NW in Issue stage = " << nw;
+    cout << "NR in Issue stage = " << nr;
 };
 
 bool Issue::insertInstructionInReservationStation(
@@ -49,7 +50,7 @@ bool Issue::insertInstructionInReservationStation(
 ) {
     if (inpReservationStation.size() >= inpReservationStationCount) {
         // reservation station is full,
-        // stall
+        // stall "callback"
         return false;
     }
     // create new rs entry, set to busy
@@ -60,25 +61,25 @@ bool Issue::insertInstructionInReservationStation(
     return true;
 }
 
-RSStatus & Issue::getReservationStationForInstruction(
+RSStatus Issue::getReservationStationForInstruction(
     Instruction inpInstruction
 ) {
     InstructionType instrType = inpInstruction.opcode;
     switch(instrType) {
         case InstructionType::FLD:
-            for(auto & rs : rsUnitLoad) {
+            for(auto rs : rsUnitLoad) {
                 if (rs.instruction == inpInstruction) return rs;
             }
         case InstructionType::FSD:
-            for(auto & rs : rsUnitStore) {
+            for(auto rs : rsUnitStore) {
                 if (rs.instruction == inpInstruction) return rs;
             }
         case InstructionType::ADD:
-            for(auto & rs : rsUnitInt) {
+            for(auto rs : rsUnitInt) {
                 if (rs.instruction == inpInstruction) return rs;
             }
         case InstructionType::ADDI:
-            for(auto & rs : this->rsUnitInt) {
+            for(auto rs : this->rsUnitInt) {
                 if (rs.instruction == inpInstruction) return rs;
             }
         case InstructionType::SLT:
@@ -106,7 +107,9 @@ RSStatus & Issue::getReservationStationForInstruction(
                 if (rs.instruction == inpInstruction) return rs;
             }
         default:
-            cout << "Instruction Type not recognized\n";
+            throw invalid_argument(
+                "the provided InstructionType was not recognized. Check to ensure that input parameters are not null"
+            );
     }
 }
 
@@ -118,6 +121,9 @@ int Issue::getReservationStationIndex(
         if (inpRsUnit.at(i).instruction == inpReservationStation.instruction)
             return i;
     }
+    throw invalid_argument(
+        "reservation station does not exist in the unit. Check to ensure that input parameters are not null"
+    );
 }
 
 ROBStatus & Issue::getROBStatusEntryForInstruction(
@@ -126,6 +132,9 @@ ROBStatus & Issue::getROBStatusEntryForInstruction(
     for(auto & entry : this->rob) {
         if (entry.instruction == inpInstruction) return entry;
     }
+    throw invalid_argument(
+        "rob status entry does not exist that contains the instruction. Check to ensure that input parameters are not null"
+    );
 }
 
 int Issue::getROBStatusEntryIndex(
@@ -136,6 +145,9 @@ int Issue::getROBStatusEntryIndex(
     if (inpRob.at(i).instruction == inpEntry.instruction)
         return i;
     }
+    throw invalid_argument(
+        "rob status entry does not exist in the buffer. Check to ensure that input parameters are not null"
+    );
 }
 
 vector<RSStatus> Issue::getReservationStationUnitFromInstructionType(InstructionType inpInstrType) {
@@ -246,13 +258,14 @@ bool Issue::dispatch() {
                     );
                     break;
                 default:
-                    cout << "Instruction Type not recognized\n";
-                    return false;
+                    throw invalid_argument(
+                        "i_dispatch: the provided InstructionType was not recognized. Check to ensure that input parameters are not null"
+                    );
             }
             if (!success) {
                 // reservation stations full,
                 // stall
-                cout << "stall i because rs insert was unsuccessful (full)\n";
+                cout << "stall i because rs insert was unsuccessful (" << getRSUnitNameFromInstructionType(iInstr.opcode) << " full)\n";
                 return false;
             }
             // rs contains new entry for current instruction, remove from dispatch instr queue

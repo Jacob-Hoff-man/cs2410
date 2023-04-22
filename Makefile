@@ -15,11 +15,14 @@ debug:
 run: 
 	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NB) $(NR)
 
-main: main.o simulator.o fetch.o decode.o issue.o
-	$(CC) -o main main.o simulator.o fetch.o decode.o issue.o
+main: common.o main.o simulator.o fetch.o decode.o issue.o 
+	$(CC) -o main common.o main.o simulator.o fetch.o decode.o issue.o
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
+
+common.o: common.cpp
+	$(CC) $(CFLAGS) common.cpp
 
 simulator.o: simulator.cpp
 	$(CC) $(CFLAGS) simulator.cpp

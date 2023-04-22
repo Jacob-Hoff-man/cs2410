@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
         int nb = stoi(argv[5]);
         int nr = stoi(argv[6]);
         Simulator * simulator = new Simulator(inpFileName, nf, ni, nw, nb, nr, false);
+        simulator->execute();
 
     } else if (argc == 8) {
         // debug mode enabled

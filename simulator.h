@@ -89,28 +89,28 @@ class Simulator {
         ~Simulator();
         // debug
         void printMemories() {
-            cout << "MEMORIES CACHE (size=" << this->memories.size() << ")\n";
+            cout << "\n\nMEMORIES CACHE (size=" << this->memories.size() << ")\n";
             for(const auto& elem : memories) {
                 cout << elem.first << " " << elem.second << "\n";
             }
         }
         void printSimulatorInstructions();
         void printSimulatorBranchLabelsTable() {
-            cout << "BRANCH LABELS TABLE\n";
+            cout << "\n\nBRANCH LABELS TABLE (size=" << this->branchLabelsTable.size() << ")\n";
             for (const auto& elem : branchLabelsTable) {
                 cout << elem.first << " " << elem.second << "\n";
             }
         }
         void printCurrentAddress() {
-            cout << "\nAddress = " << address << "\n";
+            cout << "\n\nAddress = " << address << "\n";
         }
         void printSimulatorCurrentCycleCount() {
-            cout << "\ncycleCount = " << cycleCount << "\n";
+            cout << "\n\ncycleCount = " << cycleCount << "\n";
         }
         void printSimulatorFetchInstructionQueue();
         void printSimulatorDecodeInstructionQueue();
         void printSimulatorBtbMap() {
-            cout << "BTB\n";
+            cout << "\n\nBTB (size=" << this->btb.size() << ")\n";
             for (auto & kv : btb) {
                 cout << "\naddress = " << kv.first << 
                 "\n   branch translation = {" << kv.second.first << ", " << kv.second.second <<
@@ -118,19 +118,19 @@ class Simulator {
             }
         }
         void printSimulatorMappingTable() {
-            cout << "MAPPING TABLE\n";
+            cout << "\n\nMAPPING TABLE (size=" << this->mappingTable.size() << ")\n";
             for (const auto& elem : mappingTable) {
                 cout << elem.first << " " << elem.second << "\n";
             }
         }
         void printSimulatorFreeList(){ 
-            cout << "FREE LIST\n";
+            cout << "\n\nFREE LIST (size=" << this->freeList.size() << ")\n";
             for (const auto& elem : freeList) {
                 cout << "\n" << elem << "\n";
             }
         }
         void printSimulatorMappingTableHistory() {
-            cout << "MAPPING TABLE HISTORY\n";
+            cout << "\n\nMAPPING TABLE HISTORY (size=" << this->mappingTableHistory.size() << ")\n";
             int i = 0;
             for (const auto& mt : mappingTableHistory) {
                 cout << "MAPPING TABLE index " << i++ << "\n";
@@ -140,7 +140,7 @@ class Simulator {
             }
         }
         void printSimulatorFreeListHistory() {
-            cout << "FREE LIST HISTORY\n";
+            cout << "\n\nFREE LIST HISTORY (size=" << this->freeListHistory.size() << ")\n";
             int i = 0;
             for (const auto& fl : freeListHistory) {
                 cout << "FREE LIST index " << i++ << "\n";

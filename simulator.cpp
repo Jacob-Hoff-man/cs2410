@@ -277,7 +277,7 @@ void Simulator::execute() {
     //     //printSimulatorFetchInstructionQueue();
     //     cyclePipeline();
     // }
-    cout << "\nrdone\n";
+    cout << "\ndone\n";
     printSimulatorDecodeInstructionQueue();
     // printSimulatorBranchLabelsTable();
     // printSimulatorBtbMap();
@@ -340,8 +340,6 @@ Simulator::Simulator(
         nw,
         nr
     );
-    // test run
-    this->execute();
 }
 
 Simulator::~Simulator() {}

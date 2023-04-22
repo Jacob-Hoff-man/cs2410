@@ -15,8 +15,6 @@
 class Issue: public Stage {
     private:
         deque<Instruction> & dInstructionQueue;
-        int & nw;
-        int & nr;
         // reservation stations
         vector<RSStatus> & rsUnitInt;
         vector<RSStatus> & rsUnitLoad;
@@ -26,13 +24,15 @@ class Issue: public Stage {
         vector<RSStatus> & rsUnitFpDiv;
         vector<RSStatus> & rsUnitBu;
         deque<ROBStatus> & rob;
+        int & nw;
+        int & nr;
 
         bool insertInstructionInReservationStation(
             vector<RSStatus> & inpReservationStation,
             int inpReservationStationCount,
             Instruction inpInstruction
         );
-        RSStatus & getReservationStationForInstruction(
+        RSStatus getReservationStationForInstruction(
             Instruction inpInstruction
         );
         int getReservationStationIndex(
