@@ -258,6 +258,7 @@ bool Simulator::readInputFile(const char * inpFile) {
 void Simulator::cyclePipeline() {
     printSimulatorCurrentCycleCount();
     // run stages backwards
+    e->dispatch();
     i->dispatch();
     d->dispatch();
     f->dispatch();
@@ -279,12 +280,12 @@ void Simulator::execute() {
     // }
     cout << "\ndone\n";
     printSimulatorDecodeInstructionQueue();
-    // printSimulatorBranchLabelsTable();
-    // printSimulatorBtbMap();
-    // printSimulatorMappingTable();
-    // printSimulatorFreeList();
-    // printSimulatorMappingTableHistory();
-    // printSimulatorFreeListHistory();
+    printSimulatorBranchLabelsTable();
+    printSimulatorBtbMap();
+    printSimulatorMappingTable();
+    printSimulatorFreeList();
+    printSimulatorMappingTableHistory();
+    printSimulatorFreeListHistory();
     printSimulatorReservationStations();
     printSimulatorROB();
 }
@@ -297,14 +298,16 @@ Simulator::Simulator(
     int nb,
     int nr,
     bool debugMode
-) {
+) :
+    inpFileName(inpFileName),
+    nf(nf),
+    ni(ni),
+    nw(nw),
+    nb(nb),
+    nr(nr),
+    debugMode(debugMode)
+{
     // init
-    this->debugMode = debugMode;
-    this->nf = nf;
-    this->ni = ni;
-    this->nw = nw;
-    this->nb = nb;
-    this->nr = nr;
     readInputFile(inpFileName.c_str());
     initSimulatorPhysicalRegs();
     // init pipeline stages
@@ -340,6 +343,19 @@ Simulator::Simulator(
         nw,
         nr
     );
+    this->e = new Execute(
+        rsUnitInt,
+        rsUnitLoad,
+        rsUnitStore,
+        rsUnitFpAdd,
+        rsUnitFpMult,
+        rsUnitFpDiv,
+        rsUnitBu,
+        rob,
+        nw,
+        nr
+    );
+    printSimulatorROB();
 }
 
 Simulator::~Simulator() {}

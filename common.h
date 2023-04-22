@@ -91,6 +91,6 @@ string trimOffset(const string inpString);
 string appendOffset(const string inpString, const int offset);
 void printROBStatus(ROBStatus inpEntry);
 void printRSStatus(RSStatus inpRs);
-string getRSUnitNameFromInstructionType(InstructionType inpInstrType);
+string getRSNameFromInstructionType(InstructionType inpInstrType);
 
 #endif

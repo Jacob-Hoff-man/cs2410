@@ -131,7 +131,7 @@ void printRSStatus(RSStatus inpRs) {
     printInstruction(inpRs.instruction);
 }
 
-string getRSUnitNameFromInstructionType(InstructionType inpInstrType) {
+string getRSNameFromInstructionType(InstructionType inpInstrType) {
     switch (inpInstrType) {
         case InstructionType::FLD: return "LOAD";
         case InstructionType::FSD: return "STORE";

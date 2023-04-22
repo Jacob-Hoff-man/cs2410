@@ -5,7 +5,7 @@ Fetch::Fetch(
     deque<Instruction> & fInstructionQueue,
     int & programCounter,
     unordered_map<int, pair<int, BranchPredictionType>> & btb,
-    int & nf
+    const int nf
 ) :
     instructions(instructions),
     fInstructionQueue(fInstructionQueue),
@@ -14,17 +14,13 @@ Fetch::Fetch(
     nf(nf)
 {
     this->stageType = StageType::FETCH;
-    this->instructions = instructions;
-    this->programCounter = programCounter;
-    this->fInstructionQueue = fInstructionQueue;
-    this->btb = btb;
-    this->nf = nf;
     printStageType();
-    cout << "NF in Fetch stage = " << nf;
+    cout << "\nNF in Fetch stage = " << nf;
+    cout << "\n";
 };
 
 bool Fetch::dispatch() {
-    cout << "\nf_dispatch called=\n";
+    cout << "\nf_dispatch called (nf=" << nf << ")=\n";
     for (int i = 0; i < nf; i++) {
         if (instructions.empty() || fInstructionQueue.size() >= nf || programCounter > instructions.size()-1) {
             // either no instructions available, or fInstructionQueue is full, or programCounter points beyond max addr

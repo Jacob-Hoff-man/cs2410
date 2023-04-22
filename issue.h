@@ -24,8 +24,8 @@ class Issue: public Stage {
         vector<RSStatus> & rsUnitFpDiv;
         vector<RSStatus> & rsUnitBu;
         deque<ROBStatus> & rob;
-        int & nw;
-        int & nr;
+        const int nw;
+        const int nr;
 
         bool insertInstructionInReservationStation(
             vector<RSStatus> & inpReservationStation,
@@ -60,8 +60,8 @@ class Issue: public Stage {
         vector<RSStatus> & rsUnitFpDiv,
         vector<RSStatus> & rsUnitBu,
         deque<ROBStatus> & rob,
-        int & nw,
-        int & nr
+        const int nw,
+        const int nr
     );
     ~Issue();
 };

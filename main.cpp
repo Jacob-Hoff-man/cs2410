@@ -4,24 +4,24 @@ int main(int argc, char *argv[])
 {
     cout << "\n\nhello world\n";
     if (argc == 7) {
-        string inpFileName = argv[1];
-        int nf = stoi(argv[2]);
-        int ni = stoi(argv[3]);
-        int nw = stoi(argv[4]);
-        int nb = stoi(argv[5]);
-        int nr = stoi(argv[6]);
+        const string inpFileName = argv[1];
+        const int nf = stoi(argv[2]);
+        const int ni = stoi(argv[3]);
+        const int nw = stoi(argv[4]);
+        const int nb = stoi(argv[5]);
+        const int nr = stoi(argv[6]);
         Simulator * simulator = new Simulator(inpFileName, nf, ni, nw, nb, nr, false);
         simulator->execute();
 
     } else if (argc == 8) {
         // debug mode enabled
-        string inpFileName = argv[1];
-        int nf = stoi(argv[2]);
-        int ni = stoi(argv[3]);
-        int nw = stoi(argv[4]);
-        int nb = stoi(argv[5]);
-        int nr = stoi(argv[6]);
-        bool debugMode = (bool)stoi(argv[7]);
+        const string inpFileName = argv[1];
+        const int nf = stoi(argv[2]);
+        const int ni = stoi(argv[3]);
+        const int nw = stoi(argv[4]);
+        const int nb = stoi(argv[5]);
+        const int nr = stoi(argv[6]);
+        const bool debugMode = (bool)stoi(argv[7]);
 
         cout << "INPUT FILE NAME=" << inpFileName <<
         "\n NF=" << nf <<

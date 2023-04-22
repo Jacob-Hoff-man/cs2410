@@ -18,8 +18,8 @@ class Decode: public Stage {
         deque<unordered_map<string, string>> & mappingTableHistory;
         deque<deque<string>> & freeListHistory;
         unordered_map<string, int> & branchLabelsTable;
-        int & nf;
-        int & ni;
+        const int nf;
+        const int ni;
     public:
         bool dispatch();
     Decode(
@@ -31,8 +31,8 @@ class Decode: public Stage {
         deque<unordered_map<string, string>> & mappingTableHistory,
         deque<deque<string>> & freeListHistory,
         unordered_map<string, int> & branchLabelsTable,
-        int & nf,
-        int & ni
+        const int nf,
+        const int ni
     );
     ~Decode();
 };

@@ -10,8 +10,8 @@ Issue::Issue(
     vector<RSStatus> & rsUnitFpDiv,
     vector<RSStatus> & rsUnitBu,
     deque<ROBStatus> & rob,
-    int & nw,
-    int & nr
+    const int nw,
+    const int nr
 ) :
     dInstructionQueue(dInstructionQueue),
     rsUnitInt(rsUnitInt),
@@ -26,21 +26,10 @@ Issue::Issue(
     nr(nr)
 {
     this->stageType = StageType::ISSUE;
-    this->dInstructionQueue = dInstructionQueue;
-    this->rsUnitInt = rsUnitInt;
-    this->rsUnitLoad = rsUnitLoad;
-    this->rsUnitStore = rsUnitStore;
-    this->rsUnitFpAdd = rsUnitFpAdd;
-    this->rsUnitFpMult = rsUnitFpMult;
-    this->rsUnitFpDiv = rsUnitFpDiv;
-    this->rsUnitBu = rsUnitBu;
-    this-> rob = rob;
-    this->nw = nw;
-    this->nr = nr;
-
     printStageType();
-    cout << "NW in Issue stage = " << nw;
-    cout << "NR in Issue stage = " << nr;
+    cout << "\nNW in Issue stage = " << nw;
+    cout << "\nNR in Issue stage = " << nr;
+    cout << "\n";
 };
 
 bool Issue::insertInstructionInReservationStation(
@@ -167,12 +156,12 @@ vector<RSStatus> Issue::getReservationStationUnitFromInstructionType(Instruction
 
 string Issue::generateROBStatusEntryName(Instruction inpInstr) {
     int unitSize = getReservationStationUnitFromInstructionType(inpInstr.opcode).size();
-    return getRSUnitNameFromInstructionType(inpInstr.opcode) + to_string(unitSize);
+    return getRSNameFromInstructionType(inpInstr.opcode) + to_string(unitSize);
 }
 
 
 bool Issue::dispatch() {
-    cout << "\ni_dispatch called=\n";
+    cout << "\ni_dispatch called (nw=" << nw << " nr=" << nr << ")=\n";
     
     for (int i = 0; i < nw; i++) {
         if (dInstructionQueue.empty() || rob.size() >= nr) {
@@ -180,7 +169,8 @@ bool Issue::dispatch() {
             // or if reorder buffer is full
             // stall
             if (dInstructionQueue.empty()) cout << "stall i because dInstrQueue empty\n";
-            if (rob.size() >= nr) cout << "stall i because rob size == nr \n";
+            cout << rob.size() << " and " << this->nr;
+            if (rob.size() == this->nr) cout << "stall i because rob size == nr \n";
             return false;
         } else {
             Instruction iInstr = this->dInstructionQueue.front();
@@ -265,7 +255,7 @@ bool Issue::dispatch() {
             if (!success) {
                 // reservation stations full,
                 // stall
-                cout << "stall i because rs insert was unsuccessful (" << getRSUnitNameFromInstructionType(iInstr.opcode) << " full)\n";
+                cout << "stall i because rs insert was unsuccessful (" << getRSNameFromInstructionType(iInstr.opcode) << " full)\n";
                 return false;
             }
             // rs contains new entry for current instruction, remove from dispatch instr queue

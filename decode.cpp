@@ -9,8 +9,8 @@ Decode::Decode(
     deque<unordered_map<string, string>> & mappingTableHistory,
     deque<deque<string>> & freeListHistory,
     unordered_map<string, int> & branchLabelsTable,
-    int & nf,
-    int & ni
+    const int nf,
+    const int ni
 ) :
     fInstructionQueue(fInstructionQueue),
     btb(btb),
@@ -24,17 +24,10 @@ Decode::Decode(
     ni(ni)
 {
     this->stageType = StageType::DECODE;
-    this->fInstructionQueue = fInstructionQueue;
-    this->btb = btb;
-    this->dInstructionQueue = dInstructionQueue;
-    this->mappingTable = mappingTable;
-    this->freeList = freeList;
-    this->branchLabelsTable = branchLabelsTable;
-    this->nf = nf;
-    this->ni = ni;
     printStageType();
-    cout << "nf in Decode stage = " << nf << "\n"
-        << "ni in Decode stage = " << ni << "\n";
+    cout << "\nNF in Decode stage = " << nf << "\n"
+        << "\nNI in Decode stage = " << ni << "\n";
+    cout << "\n";
 };
 
 string Decode::performRegisterRenaming(string inpRegName, bool isDestinationReg) {
@@ -71,7 +64,7 @@ string Decode::performRegisterRenaming(string inpRegName, bool isDestinationReg)
 }
 
 bool Decode::dispatch() {
-    cout << "\nd_dispatch called=\n";
+    cout << "\nd_dispatch called (nf=" << nf << " ni=" << ni << ")=\n";
     // throughput syncronized with fetch stage i.e. ni param
     for (int i = 0; i < nf; i++) {
         if (fInstructionQueue.empty() || dInstructionQueue.size() >= ni) {

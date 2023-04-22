@@ -9,7 +9,7 @@ class Fetch: public Stage {
         deque<Instruction> & fInstructionQueue;
         int & programCounter;
         unordered_map<int, pair<int, BranchPredictionType>> & btb;
-        int & nf;
+        const int nf;
     public:
         bool dispatch();
     Fetch(
@@ -17,7 +17,7 @@ class Fetch: public Stage {
         deque<Instruction> & fInstructionQueue,
         int & programCounter,
         unordered_map<int, pair<int, BranchPredictionType>> & btb,
-        int & nf
+        const int nf
     );
     ~Fetch();
 };

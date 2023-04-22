@@ -7,33 +7,23 @@
 #include "fetch.h"
 #include "decode.h"
 #include "issue.h"
+#include "execute.h"
 
 #define REGISTER_COUNT 32
-
-#define INT_LATENCY 1
-#define LOAD_LATENCY 1
-#define STORE_LATENCY 1
-#define FPADD_LATENCY 3
-#define FPMULT_LATENCY 4
-#define FPDIV_LATENCY 8
-#define BU_LATENCY 1
-
-#define FPADD_IS_PIPELINED true
-#define FPMULT_IS_PIPELINED true
-#define FPDIV_IS_PIPELINED false
 
 class Simulator {
     private:
         // simulation
-        bool debugMode = false;
         string inpFileName = "";
-        int nf, ni, nw, nb, nr;
+        const int nf, ni, nw, nb, nr;
+        bool debugMode = false;
+        // system memory cache
         unordered_map<int, double> memories;
         unordered_map<string, int> branchLabelsTable;
         int address = 0;
-        int cycleCount = 0;
+        int cycleCount = 1;
         int programCounter = 0;
-        // instruction cache
+        // system instruction cache
         deque<Instruction> instructions;
         // fetch instruction queue (before decode stage)
         deque<Instruction> fInstructionQueue;
@@ -61,6 +51,7 @@ class Simulator {
         Fetch * f;
         Decode * d;
         Issue * i;
+        Execute * e;
         void tokenizeMemory(char * inpStr);
         void tokenizeInstruction(char * inpStr);
         bool readInputFile(const char * inpFile);
@@ -79,12 +70,12 @@ class Simulator {
         void execute(int inpCycleCount);
         Simulator(
             string inpFileName,
-            int nf,
-            int ni,
-            int nw,
-            int nb,
-            int nr,
-            bool debugMode
+            const int nf,
+            const int ni,
+            const int nw,
+            const int nb,
+            const int nr,
+            const bool debugMode
         );
         ~Simulator();
         // debug
@@ -112,8 +103,8 @@ class Simulator {
         void printSimulatorBtbMap() {
             cout << "\n\nBTB (size=" << this->btb.size() << ")\n";
             for (auto & kv : btb) {
-                cout << "\naddress = " << kv.first << 
-                "\n   branch translation = {" << kv.second.first << ", " << kv.second.second <<
+                cout << "\naddress=" << kv.first << 
+                "\n   branch translation={" << kv.second.first << ", " << kv.second.second <<
                 "}\n";
             }
         }
