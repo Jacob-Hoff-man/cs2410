@@ -4,7 +4,7 @@ Fetch::Fetch(
     deque<Instruction> & instructions,
     deque<Instruction> & fInstructionQueue,
     int & programCounter,
-    unordered_map<int, pair<int, int>> & btb,
+    unordered_map<int, pair<int, BranchPredictionType>> & btb,
     int & nf
 ) :
     instructions(instructions),
@@ -34,7 +34,7 @@ bool Fetch::dispatch() {
             Instruction iInstr = this->instructions[programCounter];
             fInstructionQueue.push_back(iInstr);
             if ((iInstr.opcode == InstructionType::BNE) && (btb.count(iInstr.address))) {
-                if (btb.find(iInstr.address) != btb.end()) {
+                if (btb.count(iInstr.address)) {
                     // address exists in btb
                     programCounter = btb[iInstr.address].first;
                     cout << "ADDRESS EXISTS IN BTB" << "\n";

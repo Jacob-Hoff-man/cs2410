@@ -14,8 +14,8 @@ debug:
 run: 
 	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NR) $(NB)
 
-main: main.o simulator.o fetch.o decode.o
-	$(CC) -o main main.o simulator.o fetch.o decode.o
+main: main.o simulator.o fetch.o decode.o issue.o
+	$(CC) -o main main.o simulator.o fetch.o decode.o issue.o
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -28,6 +28,9 @@ fetch.o: fetch.cpp
 
 decode.o: decode.cpp
 	$(CC) $(CFLAGS) decode.cpp
-	
+
+issue.o: issue.cpp
+	$(CC) $(CFLAGS) issue.cpp
+
 clean: 
 	rm *.o main

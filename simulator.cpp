@@ -1,7 +1,3 @@
-#include <fstream>
-#include <cstring>
-#include <algorithm>
-#include <ctype.h>
 #include "simulator.h"
 
 const char COMMENT_LINE_PREFIX = '%';
@@ -218,7 +214,7 @@ void Simulator::tokenizeInstruction(char * inpStr) {
     // add branch label to table if exists
     if (!branchLabel.empty()) branchLabelsTable[branchLabel] = address;
     // build current Instruction struct
-    struct Instruction currentInstr;
+    Instruction currentInstr;
     currentInstr.address = address++;
     currentInstr.opcode = opcode;
     currentInstr.rd = rd;
@@ -260,27 +256,37 @@ bool Simulator::readInputFile(const char * inpFile) {
 }
 
 void Simulator::cyclePipeline() {
+    printSimulatorCurrentCycleCount();
     // run stages backwards
+    i->dispatch();
     d->dispatch();
     f->dispatch();
     tickCycleCount();
 }
 
-void Simulator::execute() {
-    while(programCounter <= instructions.size()-1 || !fInstructionQueue.empty()) {
-        //printSimulatorCurrentCycleCount();
-        //printSimulatorBtbMap();
-        //printSimulatorFetchInstructionQueue();
+void Simulator::cyclePipeline(int cycles) {
+    for (int i = 0; i < cycles; i++) {
         cyclePipeline();
     }
+}
+void Simulator::execute() {
+    cyclePipeline(20);
+    // while(programCounter <= instructions.size()-1 || !dInstructionQueue.empty()) {
+    //     //printSimulatorCurrentCycleCount();
+    //     //printSimulatorBtbMap();
+    //     //printSimulatorFetchInstructionQueue();
+    //     cyclePipeline();
+    // }
     cout << "\nrdone\n";
     printSimulatorDecodeInstructionQueue();
-    printSimulatorBranchLabelsTable();
-    printSimulatorBtbMap();
-    printSimulatorMappingTable();
-    printSimulatorFreeList();
-    printSimulatorMappingTableHistory();
-    printSimulatorFreeListHistory();
+    // printSimulatorBranchLabelsTable();
+    // printSimulatorBtbMap();
+    // printSimulatorMappingTable();
+    // printSimulatorFreeList();
+    // printSimulatorMappingTableHistory();
+    // printSimulatorFreeListHistory();
+    printSimulatorReservationStations();
+    printSimulatorROB();
 }
 
 Simulator::Simulator(
@@ -320,6 +326,19 @@ Simulator::Simulator(
         branchLabelsTable,
         nf,
         ni
+    );
+    this->i = new Issue(
+        dInstructionQueue,
+        rsUnitInt,
+        rsUnitLoad,
+        rsUnitStore,
+        rsUnitFpAdd,
+        rsUnitFpMult,
+        rsUnitFpDiv,
+        rsUnitBu,
+        rob,
+        nw,
+        nr
     );
     // test run
     this->execute();

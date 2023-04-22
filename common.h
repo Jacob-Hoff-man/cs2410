@@ -1,10 +1,15 @@
-#include <string>
-
-using namespace std;
-
 #ifndef H_COMMON
 #define H_COMMON
 
+#include <string>
+#include <iostream>
+#include <deque>
+#include <unordered_map>
+#include <vector>
+
+using namespace std;
+
+// enumerations
 enum InstructionType {
     FLD,
     FSD,
@@ -18,6 +23,30 @@ enum InstructionType {
     BNE
 };
 
+enum BranchPredictionType {
+    WEAK_TAKEN,
+    STRONG_TAKEN,
+    WEAK_NOT_TAKEN,
+    STRONG_NOT_TAKEN
+};
+
+enum StageType {
+    FETCH,
+    DECODE,
+    ISSUE,
+    EXECUTE,
+    MEMORY,
+    WRITE_BACK,
+    COMMIT
+};
+
+enum InstructionStatusType {
+    ISSUED,
+    EXECUTING,
+    WRITING_RESULT
+};
+
+// structs
 struct Instruction {
     int address;
     InstructionType opcode;
@@ -27,6 +56,44 @@ struct Instruction {
     int immediate;
 };
 
+static bool operator==(Instruction const &lhs, Instruction const &rhs) {
+    return lhs.address == rhs.address and
+        lhs.opcode == rhs.opcode and
+        lhs.rd == rhs.rd and
+        lhs.rs == rhs.rs and
+        lhs.rt == rhs.rt and
+        lhs.immediate == rhs.immediate;
+}
+ 
+static bool operator!=(Instruction const &lhs, Instruction const &rhs) {
+    return lhs.address != rhs.address or
+        lhs.opcode != rhs.opcode or
+        lhs.rd != rhs.rd or
+        lhs.rs != rhs.rs or
+        lhs.rt != rhs.rt or
+        lhs.immediate != rhs.immediate;
+}
+
+struct ROBStatus {
+    bool busy = false;
+    Instruction instruction; // opcode = type, rd = dest
+    InstructionStatusType status;
+    double value;
+    string entryName;
+};
+
+struct RSStatus {
+    bool busy = false;
+    Instruction instruction;
+    string vj = "";
+    string vk = "";
+    string qj = "";
+    string qk = "";
+    string destination;
+    int a = -1;
+};
+
+// helpers
 static string toUpper(string inpString) {
     string temp = inpString;
     transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
@@ -49,7 +116,7 @@ static InstructionType getInstructionTypeFromString(const string inpString) {
 static string getStringFromInstructionType(const InstructionType inpInstrType) {
     switch (inpInstrType) {
         case InstructionType::FLD: return "FLD";
-        case InstructionType::FSD: return "FLD";
+        case InstructionType::FSD: return "FSD";
         case InstructionType::ADD: return "ADD";
         case InstructionType::ADDI: return "ADDI";
         case InstructionType::SLT: return "SLT";
@@ -111,4 +178,26 @@ static string appendOffset(const string inpString, const int offset) {
     return to_string(offset) + "(" + inpString + ")";
 }
 
+static void printROBStatus(ROBStatus inpEntry) {
+    cout << "REORDER BUFFER ENTRY =\n" <<
+        "entry name=" << inpEntry.entryName << "\n" <<
+        "busy=" << inpEntry.busy << "\n" <<
+        "status=" << inpEntry.status << "\n" <<
+        "destination=" << inpEntry.instruction.rd << "\n" <<
+        "value=" << inpEntry.value << "\n";
+    printInstruction(inpEntry.instruction);
+
+}
+
+static void printRSStatus(RSStatus inpRs) {
+    cout << "RESERVATION STATION ENTRY =\n" <<
+        "busy=" << inpRs.busy << "\n" <<
+        "vj=" << inpRs.vj << "\n" <<
+        "vk=" << inpRs.vk << "\n" <<
+        "qj=" << inpRs.qj << "\n" <<
+        "qk=" << inpRs.qk << "\n" <<
+        "destination=" << inpRs.qk << "\n" <<
+        "a=" << inpRs.a << "\n";
+    printInstruction(inpRs.instruction);
+}
 #endif

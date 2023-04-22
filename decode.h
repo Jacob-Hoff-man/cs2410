@@ -1,20 +1,17 @@
-#include <deque>
-#include <unordered_map>
-
 #ifndef H_DECODE
 #define H_DECODE
 
 #include "stage.h"
-#include "common.h"
 
 #define FREE_LIST_EMPTY_CODE " "
 #define ZERO_REGISTER_NAME "$0"
+#define BTB_ENTRIES_COUNT 16
 
 class Decode: public Stage {
     private:
         string performRegisterRenaming(string inpRegName, bool isDestinationReg);
         deque<Instruction> & fInstructionQueue;
-        unordered_map<int, pair<int, int>> & btb;
+        unordered_map<int, pair<int, BranchPredictionType>> & btb;
         deque<Instruction> & dInstructionQueue;
         unordered_map<string, string> & mappingTable;
         deque<string> & freeList;
@@ -27,7 +24,7 @@ class Decode: public Stage {
         bool dispatch();
     Decode(
         deque<Instruction> & fInstructionQueue,
-        unordered_map<int, pair<int, int>> & btb,
+        unordered_map<int, pair<int, BranchPredictionType>> & btb,
         deque<Instruction> & dInstructionQueue,
         unordered_map<string, string> & mappingTable,
         deque<string> & freeList,

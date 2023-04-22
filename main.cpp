@@ -1,12 +1,4 @@
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <vector>
-//
 #include "simulator.h"
-#include "fetch.h"
-
-using namespace std;
 
 int main(int argc, char *argv[])
 {
