@@ -42,154 +42,6 @@ Issue::Issue(
     cout << "NW in Issue stage = " << nw;
 };
 
-bool Issue::dispatch() {
-    cout << "\ni_dispatch called=\n";
-    
-    for (int i = 0; i < nw; i++) {
-        if (dInstructionQueue.empty() || rob.size() >= nr) {
-            // no instructions are available from decode stage,
-            // or if reorder buffer is full
-            // stall
-            return false;
-        } else {
-            Instruction iInstr = this->dInstructionQueue.front();
-            // attempt to insert current instruction into corresponding reservation station
-            bool success = false;
-            switch(iInstr.opcode) {
-                case InstructionType::FLD:
-                    success = insertInstructionInReservationStation(
-                        rsUnitLoad,
-                        RS_COUNT_LOAD,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::FSD:
-                    success = insertInstructionInReservationStation(
-                        rsUnitStore,
-                        RS_COUNT_STORE,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::ADD:
-                    success = insertInstructionInReservationStation(
-                        rsUnitInt,
-                        RS_COUNT_INT,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::ADDI:
-                    success = insertInstructionInReservationStation(
-                        rsUnitInt,
-                        RS_COUNT_INT,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::SLT:
-                    success = insertInstructionInReservationStation(
-                        rsUnitInt,
-                        RS_COUNT_INT,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::FADD:
-                    success = insertInstructionInReservationStation(
-                        rsUnitFpAdd,
-                        RS_COUNT_FPADD,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::FSUB:
-                    success = insertInstructionInReservationStation(
-                        rsUnitFpAdd,
-                        RS_COUNT_FPADD,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::FMUL:
-                    success = insertInstructionInReservationStation(
-                        rsUnitFpMult,
-                        RS_COUNT_FPMULT,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::FDIV:
-                    success = insertInstructionInReservationStation(
-                        rsUnitFpDiv,
-                        RS_COUNT_FPDIV,
-                        iInstr
-                    );
-                    break;
-                case InstructionType::BNE:
-                    success = insertInstructionInReservationStation(
-                        rsUnitBu,
-                        RS_COUNT_BU,
-                        iInstr
-                    );
-                    break;
-                default:
-                    cout << "Instruction Type not recognized\n";
-                    return false;
-            }
-            if (!success) {
-                // reservation stations full,
-                // stall
-                return false;
-            }
-            // rs contains new entry for current instruction, remove from dispatch instr queue
-            this->dInstructionQueue.pop_front();
-            // insert entry into ROB
-            ROBStatus robEntry;
-            robEntry.instruction = iInstr;
-            robEntry.status = InstructionStatusType::ISSUED;
-            robEntry.busy = true;
-            robEntry.entryName = getStringFromInstructionType(iInstr.opcode) + to_string(iInstr.address);   // might need to change this? must be a pk
-            this->rob.push_back(robEntry);
-            RSStatus iInstrRs = getReservationStationForInstruction(iInstr);
-            iInstrRs.destination = robEntry.entryName;
-            // Vj, Qj
-            if (!iInstr.rs.empty()) {
-                // update Vj
-                iInstrRs.vj = iInstr.rs;
-                // update Qj
-                for (auto & entry : rob) {
-                    if (
-                        entry.instruction.rd == iInstr.rs &&
-                        entry.status != InstructionStatusType::WRITING_RESULT
-                    ) {
-                        iInstrRs.qj = entry.entryName;
-                        break;
-                    }
-                }
-
-            }
-            // Vk, Qk
-            if (!iInstr.rt.empty()) {
-                // update vk
-                iInstrRs.vk = iInstr.rt;
-                // update qk
-                for (auto & entry : rob) {
-                    if (
-                        entry.instruction.rd == iInstr.rt &&
-                        entry.status != InstructionStatusType::WRITING_RESULT
-                    ) {
-                        iInstrRs.qk = entry.entryName;
-                        break;
-                    }
-                }
-            }
-            // Immediate
-            if (
-                iInstr.opcode == InstructionType::ADDI ||
-                iInstr.opcode == InstructionType::FLD ||
-                iInstr.opcode == InstructionType::FSD
-            ) {
-                iInstrRs.a = iInstr.immediate;
-            }
-        }
-    }
-    return true;
-}
-
 bool Issue::insertInstructionInReservationStation(
     vector<RSStatus> & inpReservationStation,
     int inpReservationStationCount,
@@ -284,4 +136,177 @@ int Issue::getROBStatusEntryIndex(
     if (inpRob.at(i).instruction == inpEntry.instruction)
         return i;
     }
+}
+
+vector<RSStatus> Issue::getReservationStationUnitFromInstructionType(InstructionType inpInstrType) {
+    switch (inpInstrType) {
+        case InstructionType::FLD: return rsUnitLoad;
+        case InstructionType::FSD: return rsUnitStore;
+        case InstructionType::ADD: return rsUnitInt;
+        case InstructionType::ADDI: return rsUnitInt;
+        case InstructionType::SLT: return rsUnitInt;
+        case InstructionType::FADD: return rsUnitFpAdd;
+        case InstructionType::FSUB: return rsUnitFpAdd;
+        case InstructionType::FMUL: return rsUnitFpMult;
+        case InstructionType::FDIV: return rsUnitFpDiv;
+        case InstructionType::BNE: return rsUnitBu;
+    }
+}
+
+string Issue::generateROBStatusEntryName(Instruction inpInstr) {
+    int unitSize = getReservationStationUnitFromInstructionType(inpInstr.opcode).size();
+    return getRSUnitNameFromInstructionType(inpInstr.opcode) + to_string(unitSize);
+}
+
+
+bool Issue::dispatch() {
+    cout << "\ni_dispatch called=\n";
+    
+    for (int i = 0; i < nw; i++) {
+        if (dInstructionQueue.empty() || rob.size() >= nr) {
+            // no instructions are available from decode stage,
+            // or if reorder buffer is full
+            // stall
+            if (dInstructionQueue.empty()) cout << "stall i because dInstrQueue empty\n";
+            if (rob.size() >= nr) cout << "stall i because rob size == nr \n";
+            return false;
+        } else {
+            Instruction iInstr = this->dInstructionQueue.front();
+            // attempt to insert current instruction into corresponding reservation station
+            bool success = false;
+            switch(iInstr.opcode) {
+                case InstructionType::FLD:
+                    success = insertInstructionInReservationStation(
+                        rsUnitLoad,
+                        RS_COUNT_LOAD,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::FSD:
+                    success = insertInstructionInReservationStation(
+                        rsUnitStore,
+                        RS_COUNT_STORE,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::ADD:
+                    success = insertInstructionInReservationStation(
+                        rsUnitInt,
+                        RS_COUNT_INT,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::ADDI:
+                    success = insertInstructionInReservationStation(
+                        rsUnitInt,
+                        RS_COUNT_INT,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::SLT:
+                    success = insertInstructionInReservationStation(
+                        rsUnitInt,
+                        RS_COUNT_INT,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::FADD:
+                    success = insertInstructionInReservationStation(
+                        rsUnitFpAdd,
+                        RS_COUNT_FPADD,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::FSUB:
+                    success = insertInstructionInReservationStation(
+                        rsUnitFpAdd,
+                        RS_COUNT_FPADD,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::FMUL:
+                    success = insertInstructionInReservationStation(
+                        rsUnitFpMult,
+                        RS_COUNT_FPMULT,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::FDIV:
+                    success = insertInstructionInReservationStation(
+                        rsUnitFpDiv,
+                        RS_COUNT_FPDIV,
+                        iInstr
+                    );
+                    break;
+                case InstructionType::BNE:
+                    success = insertInstructionInReservationStation(
+                        rsUnitBu,
+                        RS_COUNT_BU,
+                        iInstr
+                    );
+                    break;
+                default:
+                    cout << "Instruction Type not recognized\n";
+                    return false;
+            }
+            if (!success) {
+                // reservation stations full,
+                // stall
+                cout << "stall i because rs insert was unsuccessful (full)\n";
+                return false;
+            }
+            // rs contains new entry for current instruction, remove from dispatch instr queue
+            this->dInstructionQueue.pop_front();
+            // insert entry into ROB
+            ROBStatus robEntry;
+            robEntry.instruction = iInstr;
+            robEntry.status = InstructionStatusType::ISSUED;
+            robEntry.busy = true;
+            robEntry.entryName = generateROBStatusEntryName(iInstr);
+            this->rob.push_back(robEntry);
+            // update rs entry
+            RSStatus iInstrRs = getReservationStationForInstruction(iInstr);
+            iInstrRs.destination = robEntry.entryName;
+            // Vj, Qj
+            if (!iInstr.rs.empty()) {
+                // update Vj
+                iInstrRs.vj = iInstr.rs;
+                // update Qj
+                for (auto & entry : rob) {
+                    if (
+                        entry.instruction.rd == iInstr.rs &&
+                        entry.status != InstructionStatusType::WRITING_RESULT
+                    ) {
+                        iInstrRs.qj = entry.entryName;
+                        break;
+                    }
+                }
+
+            }
+            // Vk, Qk
+            if (!iInstr.rt.empty()) {
+                // update vk
+                iInstrRs.vk = iInstr.rt;
+                // update qk
+                for (auto & entry : rob) {
+                    if (
+                        entry.instruction.rd == iInstr.rt &&
+                        entry.status != InstructionStatusType::WRITING_RESULT
+                    ) {
+                        iInstrRs.qk = entry.entryName;
+                        break;
+                    }
+                }
+            }
+            // Immediate
+            if (
+                iInstr.opcode == InstructionType::ADDI ||
+                iInstr.opcode == InstructionType::FLD ||
+                iInstr.opcode == InstructionType::FSD
+            ) {
+                iInstrRs.a = iInstr.immediate;
+            }
+        }
+    }
+    return true;
 }

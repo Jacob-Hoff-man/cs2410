@@ -46,6 +46,8 @@ class Issue: public Stage {
             deque<ROBStatus> inpRob,
             ROBStatus inpEntry
         );
+        vector<RSStatus> getReservationStationUnitFromInstructionType(InstructionType inpInstrType);
+        string generateROBStatusEntryName(Instruction inpInstr);
     public:
         bool dispatch();
     Issue(

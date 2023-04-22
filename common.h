@@ -6,6 +6,7 @@
 #include <deque>
 #include <unordered_map>
 #include <vector>
+#include <math.h>
 
 using namespace std;
 
@@ -78,8 +79,9 @@ struct ROBStatus {
     bool busy = false;
     Instruction instruction; // opcode = type, rd = dest
     InstructionStatusType status;
-    double value;
+    double value = NAN;
     string entryName;
+    int countLatency = 0;
 };
 
 struct RSStatus {
@@ -184,7 +186,8 @@ static void printROBStatus(ROBStatus inpEntry) {
         "busy=" << inpEntry.busy << "\n" <<
         "status=" << inpEntry.status << "\n" <<
         "destination=" << inpEntry.instruction.rd << "\n" <<
-        "value=" << inpEntry.value << "\n";
+        "value=" << inpEntry.value + 2 << "\n" <<
+        "countLatency=" << inpEntry.countLatency;
     printInstruction(inpEntry.instruction);
 
 }
@@ -199,5 +202,21 @@ static void printRSStatus(RSStatus inpRs) {
         "destination=" << inpRs.qk << "\n" <<
         "a=" << inpRs.a << "\n";
     printInstruction(inpRs.instruction);
+}
+
+static string getRSUnitNameFromInstructionType(InstructionType inpInstrType) {
+        switch (inpInstrType) {
+        case InstructionType::FLD: return "LOAD";
+        case InstructionType::FSD: return "STORE";
+        case InstructionType::ADD: return "INT";
+        case InstructionType::ADDI: return "INT";
+        case InstructionType::SLT: return "INT";
+        case InstructionType::FADD: return "FPADD";
+        case InstructionType::FSUB: return "FPADD";
+        case InstructionType::FMUL: return "FPMULT";
+        case InstructionType::FDIV: return "FPDIV";
+        case InstructionType::BNE: return "BU";
+        default: return "";
+    }
 }
 #endif
