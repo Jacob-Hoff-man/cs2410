@@ -37,14 +37,14 @@ enum StageType {
     ISSUE,
     EXECUTE,
     MEMORY,
-    WRITE_BACK,
-    COMMIT
+    WRITE_BACK
 };
 
 enum InstructionStatusType {
     ISSUED,
     EXECUTING,
-    WRITING_RESULT
+    WRITING_RESULT,
+    COMMIT
 };
 
 // structs
@@ -63,7 +63,7 @@ struct ROBStatus {
     InstructionStatusType status;
     double value = NAN;
     string entryName;
-    int countLatency = 0;
+    int countLatency = -1;
 };
 
 struct RSStatus {

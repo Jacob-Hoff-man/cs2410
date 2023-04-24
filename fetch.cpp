@@ -24,8 +24,8 @@ bool Fetch::dispatch() {
     for (int i = 0; i < nf; i++) {
         if (instructions.empty() || fInstructionQueue.size() >= nf || programCounter > instructions.size()-1) {
             // either no instructions available, or fInstructionQueue is full, or programCounter points beyond max addr
-            // stall
-            return false;
+            // stall!
+            return true; // don't count as a stall
         } else {
             Instruction iInstr = this->instructions[programCounter];
             fInstructionQueue.push_back(iInstr);
@@ -33,7 +33,6 @@ bool Fetch::dispatch() {
                 if (btb.count(iInstr.address)) {
                     // address exists in btb
                     programCounter = btb[iInstr.address].first;
-                    cout << "ADDRESS EXISTS IN BTB" << "\n";
                 } else {
                     programCounter++;
                 }

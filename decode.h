@@ -4,7 +4,6 @@
 #include "stage.h"
 
 #define FREE_LIST_EMPTY_CODE " "
-#define ZERO_REGISTER_NAME "$0"
 #define BTB_ENTRIES_COUNT 16
 
 class Decode: public Stage {

@@ -23,6 +23,10 @@ class Simulator {
         int address = 0;
         int cycleCount = 1;
         int programCounter = 0;
+        int fStallCount = 0;
+        int dStallCount = 0;
+        int iStallCount = 0;
+        int eStallCount = 0;        
         // system instruction cache
         deque<Instruction> instructions;
         // fetch instruction queue (before decode stage)
@@ -45,6 +49,7 @@ class Simulator {
         vector<RSStatus> rsUnitFpDiv;
         vector<RSStatus> rsUnitBu;
         deque<ROBStatus> rob;
+        unordered_map<string, double> cdb;
         void initSimulatorPhysicalRegs();
     public:
         // stages
@@ -79,10 +84,10 @@ class Simulator {
         );
         ~Simulator();
         // debug
-        void printMemories() {
-            cout << "\n\nMEMORIES CACHE (size=" << this->memories.size() << ")\n";
+        void printSimulatorMemories() {
+            cout << "\n\nMEMORIES CACHE (size=" << this->memories.size() << ")\n\n";
             for(const auto& elem : memories) {
-                cout << elem.first << " " << elem.second << "\n";
+                cout << "   " << elem.first << " " << elem.second << "\n";
             }
         }
         void printSimulatorInstructions();
@@ -108,10 +113,18 @@ class Simulator {
                 "}\n";
             }
         }
+        void printSimulatorPhysicalRegs() {
+            cout << "\n\nPHYSICAL REGS (size=" << this->physicalRegs.size() << ")\n";
+            for (auto & kv : physicalRegs) {
+                cout << "\n     name=" << kv.first <<
+                "\n     val=" << kv.second <<
+                "\n";
+            }
+        }
         void printSimulatorMappingTable() {
-            cout << "\n\nMAPPING TABLE (size=" << this->mappingTable.size() << ")\n";
+            cout << "\n\nMAPPING TABLE (size=" << this->mappingTable.size() << ")\n\n";
             for (const auto& elem : mappingTable) {
-                cout << elem.first << " " << elem.second << "\n";
+                cout << "   " << elem.first << " " << elem.second << "\n";
             }
         }
         void printSimulatorFreeList(){ 
@@ -165,6 +178,12 @@ class Simulator {
             printSimulatorReservationStationUnit(this->rsUnitFpDiv);
             cout << "\n\nRESERVATION STATION UNIT=BU (size=" << this->rsUnitBu.size() << ")\n";
             printSimulatorReservationStationUnit(this->rsUnitBu);
+        }
+        void printSimulatorStallCounts() {
+            cout << "\n\nFETCH STAGE STALLS= " << fStallCount << "\n" <<
+                "\nDECODE STAGE STALLS= " << dStallCount << "\n" <<
+                "\nISSUE STAGE STALLS= " << iStallCount << "\n" <<
+                "\nEXECUTE STAGE STALLS= " << eStallCount << "\n";
         }
 };
 

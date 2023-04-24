@@ -26,9 +26,32 @@ class Execute: public Stage {
         vector<RSStatus> & rsUnitFpDiv;
         vector<RSStatus> & rsUnitBu;
         deque<ROBStatus> & rob;
+        unordered_map<string, double> & cdb;
+        unordered_map<string, double> & physicalRegs;
+        unordered_map<int, double> & memories;
+        deque<string> & freeList;
         const int nw;
         const int nr;
-
+        const int nb;
+        int getLatencyFromRSName(string inpName){
+            if (inpName == "LOAD") return LOAD_LATENCY;
+            else if (inpName == "STORE") return STORE_LATENCY;
+            else if (inpName == "INT") return INT_LATENCY;
+            else if (inpName == "FPADD") return FPADD_LATENCY;
+            else if (inpName == "FPMULT") return FPMULT_LATENCY;
+            else if (inpName == "FPDIV") return FPDIV_LATENCY;
+            else if (inpName == "BU") return BU_LATENCY;
+            else throw invalid_argument(
+                "e_getLatencyFromRSName: the provided InstructionType was not recognized. Check to ensure that input parameters are not null or invalid"
+            );
+        }
+        RSStatus getReservationStationFromInstruction(Instruction inpInstruction);
+        int getReservationStationIndex(vector<RSStatus> inpRsUnit, RSStatus inpReservationStation);
+        vector<RSStatus> & getReservationStationUnitFromInstructionType(InstructionType inpInstrType);
+        void updateReservationStation(ROBStatus inpEntry, RSStatus inpRs);
+        void updateAllReservationStationsUsingEntry(ROBStatus inpEntry, vector<RSStatus> & inpRsUnit);
+        void removeReservationStation(ROBStatus inpEntry, RSStatus inpRs);
+        double alu(ROBStatus inpEntry, RSStatus inpRs);
     public:
         bool dispatch();
     Execute(
@@ -40,8 +63,13 @@ class Execute: public Stage {
         vector<RSStatus> & rsUnitFpDiv,
         vector<RSStatus> & rsUnitBu,
         deque<ROBStatus> & rob,
+        unordered_map<string, double> & cdb,
+        unordered_map<string, double> & physicalRegs,
+        unordered_map<int, double> & memories,
+        deque<string> & freeList,
         const int nw,
-        const int nr
+        const int nr,
+        const int nb
     );
     ~Execute();
 };

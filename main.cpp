@@ -34,13 +34,7 @@ int main(int argc, char *argv[])
 
         cout << "INIT SIMULATOR AND RUN readInputFile(" << inpFileName.c_str() << ")\n";
         Simulator * simulator = new Simulator(inpFileName, nf, ni, nw, nb, nr, true);
-        cout << "\nPRINT INIT MEMORIES\n";
-        simulator->printMemories();
-        cout << "\nPRINT INIT INSTRUCTIONS\n";
-        simulator->printSimulatorInstructions();
-        cout << "\nsimulator memories length = " << simulator->getMemoriesSize() << "\n";
-        cout << "\nsimulator instructions length = " << simulator->getInstructionsSize() << "\n";
-
+        simulator->execute();
     } else {
         cout << "invalid input parameters.\n    usage= ./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NR) $(NB)\n";
     }

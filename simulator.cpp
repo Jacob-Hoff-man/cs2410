@@ -40,17 +40,17 @@ void Simulator::initSimulatorPhysicalRegs() {
 }
 
 void Simulator::printSimulatorInstructions() {
-    cout << "INSTRUCTIONS CACHE\n";
+    cout << "INSTRUCTIONS CACHE (size=" << instructions.size() << ")\n";
     printInstructions(instructions);
 }
 
 void Simulator::printSimulatorFetchInstructionQueue() {
-    cout << "FETCH INSTRUCTION QUEUE\n";
+    cout << "FETCH INSTRUCTION QUEUE (size= " << fInstructionQueue.size() << ")\n";
     printInstructions(fInstructionQueue);
 }
 
 void Simulator::printSimulatorDecodeInstructionQueue() {
-    cout << "DECODE INSTRUCTION QUEUE\n";
+    cout << "DECODE INSTRUCTION QUEUE (size= " << dInstructionQueue.size() << ")\n";
     printInstructions(dInstructionQueue);
 }
 
@@ -256,38 +256,54 @@ bool Simulator::readInputFile(const char * inpFile) {
 }
 
 void Simulator::cyclePipeline() {
+    // TODO: set up Stage::debug() and use here
+    cout << "\n";
     printSimulatorCurrentCycleCount();
     // run stages backwards
-    e->dispatch();
-    i->dispatch();
-    d->dispatch();
-    f->dispatch();
+    if (!e->dispatch()) eStallCount++;
+    if (!i->dispatch()) iStallCount++;
+    if (!d->dispatch()) dStallCount++;
+    if (!f->dispatch()) fStallCount++;
     tickCycleCount();
 }
 
 void Simulator::cyclePipeline(int cycles) {
     for (int i = 0; i < cycles; i++) {
         cyclePipeline();
+        // debug per cycle
+        // printSimulatorMemories();
+        // printSimulatorDecodeInstructionQueue();
+        // printSimulatorBranchLabelsTable();
+        // printSimulatorBtbMap();
+        // printSimulatorPhysicalRegs();
+        // printSimulatorMappingTable();
+        // printSimulatorFreeList();
+        // printSimulatorMappingTableHistory();
+        // printSimulatorFreeListHistory();
+        // printSimulatorReservationStations();
+        // printSimulatorROB();
+        // printSimulatorStallCounts();
     }
 }
 void Simulator::execute() {
-    cyclePipeline(20);
-    // while(programCounter <= instructions.size()-1 || !dInstructionQueue.empty()) {
-    //     //printSimulatorCurrentCycleCount();
-    //     //printSimulatorBtbMap();
-    //     //printSimulatorFetchInstructionQueue();
-    //     cyclePipeline();
-    // }
+    cout << "\nstart\n";
+    do cyclePipeline();
+    while (fInstructionQueue.size() > 0 || dInstructionQueue.size() > 0 || rob.size() > 0);
     cout << "\ndone\n";
-    printSimulatorDecodeInstructionQueue();
-    printSimulatorBranchLabelsTable();
-    printSimulatorBtbMap();
+    // debug post execution
+    printSimulatorMemories();
+    // printSimulatorDecodeInstructionQueue();
+    // printSimulatorBranchLabelsTable();
+    // printSimulatorBtbMap();
+    printSimulatorPhysicalRegs();
     printSimulatorMappingTable();
-    printSimulatorFreeList();
-    printSimulatorMappingTableHistory();
-    printSimulatorFreeListHistory();
-    printSimulatorReservationStations();
-    printSimulatorROB();
+    // printSimulatorFreeList();
+    // printSimulatorMappingTableHistory();
+    // printSimulatorFreeListHistory();
+    // printSimulatorReservationStations();
+    // printSimulatorROB();
+    printSimulatorStallCounts();
+    cout << "\n";
 }
 
 Simulator::Simulator(
@@ -352,10 +368,14 @@ Simulator::Simulator(
         rsUnitFpDiv,
         rsUnitBu,
         rob,
+        cdb,
+        physicalRegs,
+        memories,
+        freeList,
         nw,
-        nr
+        nr,
+        nb
     );
-    printSimulatorROB();
 }
 
 Simulator::~Simulator() {}

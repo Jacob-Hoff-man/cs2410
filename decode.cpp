@@ -33,34 +33,21 @@ Decode::Decode(
 string Decode::performRegisterRenaming(string inpRegName, bool isDestinationReg) {
     string newRegName = inpRegName;
     bool inpContainedOffset = containsOffset(newRegName);
-    int offset;
     // if there exists an offset, remove from string
-    if (inpContainedOffset) {
-        newRegName = trimOffset(newRegName);
-        offset = getOffset(inpRegName);
-    }
+    if (inpContainedOffset) newRegName = trimOffset(newRegName);
     // handle zero register
-    if (newRegName == ZERO_REGISTER_NAME) {
-        if (inpContainedOffset) return appendOffset(ZERO_REGISTER_NAME, offset);
-        else return ZERO_REGISTER_NAME;
-    }
-    if (freeList.empty()) {
-        // no available free registers, return unique failure code
-        return FREE_LIST_EMPTY_CODE;
-    }
+    if (newRegName == ZERO_REGISTER_NAME) return ZERO_REGISTER_NAME;
+    // no available free registers, return unique failure code
+    if (freeList.empty()) return FREE_LIST_EMPTY_CODE;
     if (mappingTable.count(newRegName)) {
         // mappingTable contains key for inpRegName
-        if (!isDestinationReg) {
-            if (inpContainedOffset) return appendOffset(mappingTable[newRegName], offset);
-            else return mappingTable[newRegName];
-        }
+        if (!isDestinationReg) return mappingTable[newRegName];
     }
     // get free reg for new reg, insert into mappingTable
     string freeReg = freeList.front();
     freeList.pop_front();
-    mappingTable[inpRegName] = freeReg;
-    if (inpContainedOffset) return appendOffset(freeReg, offset);
-    else return freeReg;
+    mappingTable[newRegName] = freeReg;
+    return freeReg;
 }
 
 bool Decode::dispatch() {
@@ -69,14 +56,19 @@ bool Decode::dispatch() {
     for (int i = 0; i < nf; i++) {
         if (fInstructionQueue.empty() || dInstructionQueue.size() >= ni) {
             // either no instructions are available from fetch stage,
-            // or dInstructionQueue is full. stall
-            return false;
+            // or dInstructionQueue is full. stall!
+            if (dInstructionQueue.size() >= ni) return false;
+            else return true; // don't count empty fetch queue as a stall
         } else {
             Instruction iInstr = this->fInstructionQueue.front();
+            // check if original reg name contains an offset 
+            int immediateOffset = 0;
+            bool offsetExists = containsOffset(iInstr.rs);
+            if (offsetExists) immediateOffset = getOffset(iInstr.rs);
             string regName;
             switch(iInstr.opcode) {
                 // if ever regName == free list empty code,
-                // there are no available physical regs. stall
+                // there are no available physical regs. stall!
                 case InstructionType::FLD:
                     // rs
                     regName = performRegisterRenaming(iInstr.rs, false);
@@ -215,6 +207,8 @@ bool Decode::dispatch() {
                     // instruction type not recognized
                     return false;
             }
+            // if original reg name contained offset, add into immediate
+            if (offsetExists) iInstr.immediate += immediateOffset; 
             // add current instruction with renamed reg to dInstructionQueue
             fInstructionQueue.pop_front();
             dInstructionQueue.push_back(iInstr);

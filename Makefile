@@ -8,7 +8,6 @@ NW=4 # number of instructions issued per cycle to reservation stations
 NB=4 # number of common data buses
 NR=16 # number of entries available in the circular reorder buffer (ROB)
 
-
 all: main
 debug:
 	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NB) $(NR) 1

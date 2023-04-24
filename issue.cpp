@@ -39,7 +39,7 @@ bool Issue::insertInstructionInReservationStation(
 ) {
     if (inpReservationStation.size() >= inpReservationStationCount) {
         // reservation station is full,
-        // stall "callback"
+        // stall!
         return false;
     }
     // create new rs entry, set to busy
@@ -139,7 +139,7 @@ int Issue::getROBStatusEntryIndex(
     );
 }
 
-vector<RSStatus> Issue::getReservationStationUnitFromInstructionType(InstructionType inpInstrType) {
+vector<RSStatus> & Issue::getReservationStationUnitFromInstructionType(InstructionType inpInstrType) {
     switch (inpInstrType) {
         case InstructionType::FLD: return rsUnitLoad;
         case InstructionType::FSD: return rsUnitStore;
@@ -159,6 +159,15 @@ string Issue::generateROBStatusEntryName(Instruction inpInstr) {
     return getRSNameFromInstructionType(inpInstr.opcode) + to_string(unitSize);
 }
 
+void Issue::updateReservationStation(Instruction inpInstr, RSStatus inpRs){
+    // replace rs in corresponding unit
+    vector<RSStatus> & rsu = getReservationStationUnitFromInstructionType(inpInstr.opcode);
+    int index = getReservationStationIndex(
+        rsu,
+        inpRs
+    );
+    rsu[index] = inpRs;
+}
 
 bool Issue::dispatch() {
     cout << "\ni_dispatch called (nw=" << nw << " nr=" << nr << ")=\n";
@@ -167,11 +176,13 @@ bool Issue::dispatch() {
         if (dInstructionQueue.empty() || rob.size() >= nr) {
             // no instructions are available from decode stage,
             // or if reorder buffer is full
-            // stall
-            if (dInstructionQueue.empty()) cout << "stall i because dInstrQueue empty\n";
-            cout << rob.size() << " and " << this->nr;
-            if (rob.size() == this->nr) cout << "stall i because rob size == nr \n";
-            return false;
+            // stall!
+            if (dInstructionQueue.empty()) cout << "\nstall i because dInstrQueue empty\n";
+            if (rob.size() == this->nr) {
+                cout << "\nstall i because rob size == nr \n";
+                return false;
+            }
+            return true; // don't count dInstrQueue empty as a stall
         } else {
             Instruction iInstr = this->dInstructionQueue.front();
             // attempt to insert current instruction into corresponding reservation station
@@ -254,8 +265,8 @@ bool Issue::dispatch() {
             }
             if (!success) {
                 // reservation stations full,
-                // stall
-                cout << "stall i because rs insert was unsuccessful (" << getRSNameFromInstructionType(iInstr.opcode) << " full)\n";
+                // stall!
+                cout << "\nstall i because rs insert was unsuccessful (" << getRSNameFromInstructionType(iInstr.opcode) << " full)\n";
                 return false;
             }
             // rs contains new entry for current instruction, remove from dispatch instr queue
@@ -309,6 +320,8 @@ bool Issue::dispatch() {
             ) {
                 iInstrRs.a = iInstr.immediate;
             }
+            // replace rs in corresponding unit
+            updateReservationStation(iInstr, iInstrRs);
         }
     }
     return true;

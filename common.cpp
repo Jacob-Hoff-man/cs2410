@@ -36,8 +36,8 @@ InstructionType getInstructionTypeFromString(const string inpString) {
     else if (inpString =="FDIV") return InstructionType::FDIV;
     else if (inpString =="BNE") return InstructionType::BNE;
     else throw invalid_argument(
-                        "common_getInstructionTypeFromString: the provided string was not recognized as an InstructionType. Check to ensure that input parameters are not null or unequal"
-                    );
+        "common_getInstructionTypeFromString: the provided string was not recognized as an InstructionType. Check to ensure that input parameters are not null or unequal"
+    );
 };
 
 string getStringFromInstructionType(const InstructionType inpInstrType) {
@@ -53,8 +53,8 @@ string getStringFromInstructionType(const InstructionType inpInstrType) {
         case InstructionType::FDIV: return "FDIV";
         case InstructionType::BNE: return "BNE";
         default: throw invalid_argument(
-                        "common_getStringFromInstructionType: the provided InstructionType was not recognized. Check to ensure that input parameters are not null or invalid"
-                    );
+            "common_getStringFromInstructionType: the provided InstructionType was not recognized. Check to ensure that input parameters are not null or invalid"
+        );
     }
 };
 
@@ -113,7 +113,7 @@ void printROBStatus(ROBStatus inpEntry) {
         "   busy=" << inpEntry.busy << "\n" <<
         "   status=" << inpEntry.status << "\n" <<
         "   destination=" << inpEntry.instruction.rd << "\n" <<
-        "   value=" << inpEntry.value + 2 << "\n" <<
+        "   value=" << inpEntry.value << "\n" <<
         "   countLatency=" << inpEntry.countLatency;
     printInstruction(inpEntry.instruction);
 
@@ -143,6 +143,8 @@ string getRSNameFromInstructionType(InstructionType inpInstrType) {
         case InstructionType::FMUL: return "FPMULT";
         case InstructionType::FDIV: return "FPDIV";
         case InstructionType::BNE: return "BU";
-        default: return "";
+        default: throw invalid_argument(
+            "common_getRSNameFromInstructionType: the provided InstructionType was not recognized. Check to ensure that input parameters are not null or invalid"
+        );
     }
 }
