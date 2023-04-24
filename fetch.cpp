@@ -4,7 +4,7 @@ Fetch::Fetch(
     deque<Instruction> & instructions,
     deque<Instruction> & fInstructionQueue,
     int & programCounter,
-    unordered_map<int, pair<int, BranchPredictionType>> & btb,
+    unordered_map<int, pair<int, int>> & btb,
     const int nf
 ) :
     instructions(instructions),

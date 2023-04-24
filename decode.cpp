@@ -2,13 +2,14 @@
 
 Decode::Decode(
     deque<Instruction> & fInstructionQueue,
-    unordered_map<int, pair<int, BranchPredictionType>> & btb,
+    unordered_map<int, pair<int, int>> & btb,
     deque<Instruction> & dInstructionQueue,
     unordered_map<string, string> & mappingTable,
     deque<string> & freeList,
     deque<unordered_map<string, string>> & mappingTableHistory,
     deque<deque<string>> & freeListHistory,
     unordered_map<string, int> & branchLabelsTable,
+    BranchPredictor & dbp,
     const int nf,
     const int ni
 ) :
@@ -20,6 +21,7 @@ Decode::Decode(
     mappingTableHistory(mappingTableHistory),
     freeListHistory(freeListHistory),
     branchLabelsTable(branchLabelsTable),
+    dbp(dbp),
     nf(nf),
     ni(ni)
 {
@@ -222,7 +224,7 @@ bool Decode::dispatch() {
                     // current instruction is not contained in btb
                     btb[iInstr.address] = {
                         branchLabelsTable[iInstr.rt],
-                        BranchPredictionType::WEAK_TAKEN // initialize entry to weakly taken branch prediction
+                        dbp.getBranchPrediction()
                     };
                 }
             }

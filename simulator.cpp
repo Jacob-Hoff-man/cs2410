@@ -22,7 +22,10 @@ bool isBranchLabel(const string inpString) {
 }
 
 void Simulator::initSimulatorPhysicalRegs() {
-    for (int i = 0; i < REGISTER_COUNT; i++) {
+    // add $0 reg
+    physicalRegs[ZERO_REGISTER_NAME] = 0;
+    // add remaining physical regs
+    for (int i = 1; i < REGISTER_COUNT; i++) {
         
         string physicalName = "p" + to_string(i);
         // init physical reg and status
@@ -206,10 +209,9 @@ void Simulator::tokenizeInstruction(char * inpStr) {
             }
             break;
         }
-        default: {
-            // TODO: add error
-            cout << "word not recognized as a valid InstructionType: " << op << "\n";
-        }
+        default: throw invalid_argument(
+            "simulator_tokenizeMemory: the provided string was not recognized as an InstructionType. Check to ensure that input parameters are not null or unequal"
+        );
     }
     // add branch label to table if exists
     if (!branchLabel.empty()) branchLabelsTable[branchLabel] = address;
@@ -256,7 +258,7 @@ bool Simulator::readInputFile(const char * inpFile) {
 }
 
 void Simulator::cyclePipeline() {
-    // TODO: set up Stage::debug() and use here
+    // TODO: set up Stage::debug() and use here for each stage
     cout << "\n";
     printSimulatorCurrentCycleCount();
     // run stages backwards
@@ -293,8 +295,8 @@ void Simulator::execute() {
     // debug post execution
     printSimulatorMemories();
     // printSimulatorDecodeInstructionQueue();
-    // printSimulatorBranchLabelsTable();
-    // printSimulatorBtbMap();
+    printSimulatorBranchLabelsTable();
+    printSimulatorBtbMap();
     printSimulatorPhysicalRegs();
     printSimulatorMappingTable();
     // printSimulatorFreeList();
@@ -343,6 +345,7 @@ Simulator::Simulator(
         mappingTableHistory,
         freeListHistory,
         branchLabelsTable,
+        dbp,
         nf,
         ni
     );
@@ -372,6 +375,14 @@ Simulator::Simulator(
         physicalRegs,
         memories,
         freeList,
+        dbp,
+        programCounter,
+        btb,
+        mappingTable,
+        freeListHistory,
+        mappingTableHistory,
+        fInstructionQueue,
+        dInstructionQueue,
         nw,
         nr,
         nb

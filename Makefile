@@ -14,8 +14,8 @@ debug:
 run: 
 	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NB) $(NR)
 
-main: common.o main.o simulator.o fetch.o decode.o issue.o execute.o
-	$(CC) -o main common.o main.o simulator.o fetch.o decode.o issue.o execute.o
+main: common.o main.o simulator.o branchPredictor.o fetch.o decode.o issue.o execute.o
+	$(CC) -o main common.o main.o simulator.o branchPredictor.o fetch.o decode.o issue.o execute.o
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -25,6 +25,9 @@ common.o: common.cpp
 
 simulator.o: simulator.cpp
 	$(CC) $(CFLAGS) simulator.cpp
+
+branchPredictor.o: branchPredictor.cpp
+	$(CC) $(CFLAGS) branchPredictor.cpp
 
 fetch.o: fetch.cpp
 	$(CC) $(CFLAGS) fetch.cpp

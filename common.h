@@ -10,6 +10,10 @@
 
 using namespace std;
 
+// global macros
+#define REGISTER_COUNT 32
+#define ZERO_REGISTER_NAME "$0"
+
 // enumerations
 enum InstructionType {
     FLD,
@@ -45,6 +49,10 @@ enum InstructionStatusType {
     EXECUTING,
     WRITING_RESULT,
     COMMIT
+};
+
+enum ModuleType {
+    BRANCH_PREDICTOR
 };
 
 // structs

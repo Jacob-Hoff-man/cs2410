@@ -13,6 +13,14 @@ Execute::Execute(
     unordered_map<string, double> & physicalRegs,
     unordered_map<int, double> & memories,
     deque<string> & freeList,
+    BranchPredictor & dbp,
+    int & programCounter,
+    unordered_map<int, pair<int, int>> & btb,
+    unordered_map<string, string> & mappingTable,
+    deque<deque<string>> & freeListHistory,
+    deque<unordered_map<string, string>> & mappingTableHistory,
+    deque<Instruction> & fInstructionQueue,
+    deque<Instruction> & dInstructionQueue,
     const int nw,
     const int nr,
     const int nb
@@ -29,6 +37,14 @@ Execute::Execute(
     physicalRegs(physicalRegs),
     memories(memories),
     freeList(freeList),
+    dbp(dbp),
+    programCounter(programCounter),
+    btb(btb),
+    mappingTable(mappingTable),
+    freeListHistory(freeListHistory),
+    mappingTableHistory(mappingTableHistory),
+    fInstructionQueue(fInstructionQueue),
+    dInstructionQueue(dInstructionQueue),
     nw(nw),
     nr(nr),
     nb(nb)
@@ -166,14 +182,24 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
     double newVj;
     if (cdb.count(inpRs.vj)) newVj = cdb[inpRs.vj];
     else newVj = physicalRegs[inpRs.vj];
-
     double newVk;
     if (cdb.count(inpRs.vk)) newVk = cdb[inpRs.vk];
     else if (
         inpEntry.instruction.opcode != InstructionType::ADDI &&
         inpEntry.instruction.opcode != InstructionType::FLD
     ) {
+        if (inpEntry.instruction.rt == "loop") {
+            cout << "ALU SEES instruction.rt AS 'LOOP' \n";
+            cout << inpEntry.instruction.rt << "\n";
+        }
+        // TODO: FIX USING BRANCH TABLE
         if (inpEntry.instruction.rt == ZERO_REGISTER_NAME) newVk = 0;
+        else if (inpEntry.instruction.opcode == InstructionType::BNE) {
+                if (inpEntry.instruction.opcode == InstructionType::BNE) {
+                     cout << "\nBNE NEW VK (rd = " << inpEntry.instruction.rd << ") count = " << physicalRegs.count(inpEntry.instruction.rd) << " val = " << physicalRegs[inpEntry.instruction.rd];
+                }
+            newVk = physicalRegs[inpEntry.instruction.rd];
+        }
         else newVk = physicalRegs[inpEntry.instruction.rt];
     }
 
@@ -315,17 +341,46 @@ bool Execute::dispatch() {
                     if (!isnan(entry.value)) {
                         // validate branch prediction
                         if (entry.instruction.opcode == InstructionType::BNE) {
+                            programCounter = entry.instruction.address + 1;
                             if (entry.value == 1) {
-                                //TODO:
-
-
-
-
-
+                                // branch will be taken
+                                programCounter = btb[entry.instruction.address].first;
+                                if (mappingTableHistory.size()) mappingTableHistory.pop_front();
+                                if (freeListHistory.size()) freeListHistory.pop_front();
                             }
-                            // stall!
-                            cout << "\nstall e for now because branch prediction is not set up\n";
-                            return true;
+                            if (btb[entry.instruction.address].second != entry.value) {
+                                // branch prediction was wrong, need to update branch predictor state and flush
+                                cout << "\nINVALID BRANCH PREDICTION, FLUSHING PIPELINE\n";
+                                // update branch predictor state
+                                dbp.updateState(false);
+                                // flush pipeline
+                                btb[entry.instruction.address].second = entry.value;
+                                dInstructionQueue.clear();
+                                fInstructionQueue.clear();
+                                if (freeListHistory.size()) {
+                                    freeList = freeListHistory.front();
+                                    freeListHistory.clear();
+                                }
+                                if (mappingTableHistory.size()) {
+                                    mappingTable = mappingTableHistory.front();
+                                    mappingTableHistory.clear();
+                                }
+                                // flush rob until entry is head, start from back and find current instr
+                                for (int i = rob.size() - 1; i >= 0; i--) {
+                                    if (rob[i].instruction.address != entry.instruction.address) {
+                                        // clear corresponding rs and rob
+                                        RSStatus rs = getReservationStationFromInstruction(rob[i].instruction);
+                                        removeReservationStation(rob[i], rs);
+                                        rob.pop_back();
+                                        continue;
+                                    } else {
+                                        // found current entry in rob
+                                        // stall!
+                                        cout << "\nstall e because branch prediction was incorrect\n";
+                                        return false;
+                                    }
+                                }
+                            }
                         } else {
                             // insert into cdb
                             if (entry.instruction.opcode != InstructionType::FSD) cdb[entry.instruction.rd] = entry.value;

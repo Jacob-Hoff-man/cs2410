@@ -2,14 +2,14 @@
 #define H_SIM
 
 #include <fstream>
+// import modules
+#include "branchPredictor.h"
 // import stages
 #include "common.h"
 #include "fetch.h"
 #include "decode.h"
 #include "issue.h"
 #include "execute.h"
-
-#define REGISTER_COUNT 32
 
 class Simulator {
     private:
@@ -31,7 +31,9 @@ class Simulator {
         deque<Instruction> instructions;
         // fetch instruction queue (before decode stage)
         deque<Instruction> fInstructionQueue;
-        unordered_map<int, pair<int, BranchPredictionType>> btb;
+        // branch prediction
+        unordered_map<int, pair<int, int>> btb;
+        BranchPredictor dbp;
         // decode instruction queue (before issue stage)
         deque<Instruction> dInstructionQueue;
         // register renaming

@@ -2,6 +2,7 @@
 #define H_EXECUTE
 
 #include "stage.h"
+#include "branchPredictor.h"
 
 #define INT_LATENCY 1
 #define LOAD_LATENCY 1
@@ -30,6 +31,14 @@ class Execute: public Stage {
         unordered_map<string, double> & physicalRegs;
         unordered_map<int, double> & memories;
         deque<string> & freeList;
+        BranchPredictor & dbp;
+        int & programCounter;
+        unordered_map<int, pair<int, int>> & btb;
+        unordered_map<string, string> & mappingTable;
+        deque<deque<string>> & freeListHistory;
+        deque<unordered_map<string, string>> & mappingTableHistory;
+        deque<Instruction> & fInstructionQueue;
+        deque<Instruction> & dInstructionQueue;
         const int nw;
         const int nr;
         const int nb;
@@ -67,6 +76,14 @@ class Execute: public Stage {
         unordered_map<string, double> & physicalRegs,
         unordered_map<int, double> & memories,
         deque<string> & freeList,
+        BranchPredictor & dbp,
+        int & programCounter,
+        unordered_map<int, pair<int, int>> & btb,
+        unordered_map<string, string> & mappingTable,
+        deque<deque<string>> & freeListHistory,
+        deque<unordered_map<string, string>> & mappingTableHistory,
+        deque<Instruction> & fInstructionQueue,
+        deque<Instruction> & dInstructionQueue,
         const int nw,
         const int nr,
         const int nb

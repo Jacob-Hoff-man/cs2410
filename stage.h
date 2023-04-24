@@ -3,8 +3,6 @@
 
 #include "common.h"
 
-#define ZERO_REGISTER_NAME "$0"
-
 class Stage {
     private:
     public:
