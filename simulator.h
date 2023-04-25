@@ -33,7 +33,7 @@ class Simulator {
         deque<Instruction> fInstructionQueue;
         // branch prediction
         unordered_map<int, pair<int, int>> btb;
-        BranchPredictor dbp;
+        BranchPredictor * dbp;
         // decode instruction queue (before issue stage)
         deque<Instruction> dInstructionQueue;
         // register renaming

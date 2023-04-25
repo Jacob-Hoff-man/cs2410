@@ -26,7 +26,6 @@ void Simulator::initSimulatorPhysicalRegs() {
     physicalRegs[ZERO_REGISTER_NAME] = 0;
     // add remaining physical regs
     for (int i = 1; i < REGISTER_COUNT; i++) {
-        
         string physicalName = "p" + to_string(i);
         // init physical reg and status
         // initialize all to zero
@@ -43,17 +42,17 @@ void Simulator::initSimulatorPhysicalRegs() {
 }
 
 void Simulator::printSimulatorInstructions() {
-    cout << "INSTRUCTIONS CACHE (size=" << instructions.size() << ")\n";
+    cout << "\nINSTRUCTIONS CACHE (size=" << instructions.size() << ")\n";
     printInstructions(instructions);
 }
 
 void Simulator::printSimulatorFetchInstructionQueue() {
-    cout << "FETCH INSTRUCTION QUEUE (size= " << fInstructionQueue.size() << ")\n";
+    cout << "\nFETCH INSTRUCTION QUEUE (size= " << fInstructionQueue.size() << ")\n";
     printInstructions(fInstructionQueue);
 }
 
 void Simulator::printSimulatorDecodeInstructionQueue() {
-    cout << "DECODE INSTRUCTION QUEUE (size= " << dInstructionQueue.size() << ")\n";
+    cout << "\nDECODE INSTRUCTION QUEUE (size= " << dInstructionQueue.size() << ")\n";
     printInstructions(dInstructionQueue);
 }
 
@@ -287,6 +286,7 @@ void Simulator::cyclePipeline(int cycles) {
         // printSimulatorStallCounts();
     }
 }
+
 void Simulator::execute() {
     cout << "\nstart\n";
     do cyclePipeline();
@@ -295,8 +295,8 @@ void Simulator::execute() {
     // debug post execution
     printSimulatorMemories();
     // printSimulatorDecodeInstructionQueue();
-    printSimulatorBranchLabelsTable();
-    printSimulatorBtbMap();
+    // printSimulatorBranchLabelsTable();
+    // printSimulatorBtbMap();
     printSimulatorPhysicalRegs();
     printSimulatorMappingTable();
     // printSimulatorFreeList();
@@ -328,13 +328,17 @@ Simulator::Simulator(
     // init
     readInputFile(inpFileName.c_str());
     initSimulatorPhysicalRegs();
+    this->dbp = new BranchPredictor(
+        debugMode
+    );
     // init pipeline stages
     this->f = new Fetch(
         instructions,
         fInstructionQueue,
         programCounter,
         btb,
-        nf
+        nf,
+        debugMode
     );
     this->d = new Decode(
         fInstructionQueue,
@@ -347,7 +351,8 @@ Simulator::Simulator(
         branchLabelsTable,
         dbp,
         nf,
-        ni
+        ni,
+        debugMode
     );
     this->i = new Issue(
         dInstructionQueue,
@@ -360,7 +365,8 @@ Simulator::Simulator(
         rsUnitBu,
         rob,
         nw,
-        nr
+        nr,
+        debugMode
     );
     this->e = new Execute(
         rsUnitInt,
@@ -385,7 +391,8 @@ Simulator::Simulator(
         dInstructionQueue,
         nw,
         nr,
-        nb
+        nb,
+        debugMode
     );
 }
 

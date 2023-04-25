@@ -41,11 +41,15 @@ void BranchPredictor::updateState(bool inpIsCorrect) {
                 break;
         }
     }
-    cout << "\n UPDATED BRANCH PREDICTOR STATE= " << this->currentState << "\n";
+    if (debugMode) cout << "\n UPDATED BRANCH PREDICTOR STATE= " << this->currentState << "\n";
 }
 
-BranchPredictor::BranchPredictor() {
+BranchPredictor::BranchPredictor(
+    const bool debugMode
+) : 
+    debugMode(debugMode)
+{
     this->moduleType = ModuleType::BRANCH_PREDICTOR;
-    cout << "\nINITIAL BRANCH PREDICTOR STATE= " << this->currentState << "\n";
-}
+    if (debugMode) cout << "\nINITIAL BRANCH PREDICTOR STATE= " << this->currentState << "\n";
+};
 

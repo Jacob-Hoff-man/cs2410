@@ -11,7 +11,8 @@ Issue::Issue(
     vector<RSStatus> & rsUnitBu,
     deque<ROBStatus> & rob,
     const int nw,
-    const int nr
+    const int nr,
+    const bool debugMode
 ) :
     dInstructionQueue(dInstructionQueue),
     rsUnitInt(rsUnitInt),
@@ -23,13 +24,16 @@ Issue::Issue(
     rsUnitBu(rsUnitBu),
     rob(rob),
     nw(nw),
-    nr(nr)
+    nr(nr),
+    debugMode(debugMode)
 {
     this->stageType = StageType::ISSUE;
-    printStageType();
-    cout << "\nNW in Issue stage = " << nw;
-    cout << "\nNR in Issue stage = " << nr;
-    cout << "\n";
+    if (debugMode) {
+        printStageType();
+        cout << "\nNW in Issue stage = " << nw;
+        cout << "\nNR in Issue stage = " << nr;
+        cout << "\n";
+    }
 };
 
 bool Issue::insertInstructionInReservationStation(
@@ -177,11 +181,11 @@ bool Issue::dispatch() {
             // no instructions are available from decode stage,
             // or if reorder buffer is full
             // stall!
-            if (dInstructionQueue.empty()) cout << "\nstall i because dInstrQueue empty\n";
             if (rob.size() == this->nr) {
                 cout << "\nstall i because rob size == nr \n";
                 return false;
             }
+            if (dInstructionQueue.empty() && debugMode) cout << "\nstall i because dInstrQueue empty\n";
             return true; // don't count dInstrQueue empty as a stall
         } else {
             Instruction iInstr = this->dInstructionQueue.front();

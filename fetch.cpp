@@ -5,18 +5,22 @@ Fetch::Fetch(
     deque<Instruction> & fInstructionQueue,
     int & programCounter,
     unordered_map<int, pair<int, int>> & btb,
-    const int nf
+    const int nf,
+    const bool debugMode
 ) :
     instructions(instructions),
     fInstructionQueue(fInstructionQueue),
     programCounter(programCounter),
     btb(btb),
-    nf(nf)
+    nf(nf),
+    debugMode(debugMode)
 {
     this->stageType = StageType::FETCH;
-    printStageType();
-    cout << "\nNF in Fetch stage = " << nf;
-    cout << "\n";
+    if (debugMode) {
+        printStageType();
+        cout << "\nNF in Fetch stage = " << nf;
+        cout << "\n";
+    }
 };
 
 bool Fetch::dispatch() {

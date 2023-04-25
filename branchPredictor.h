@@ -7,10 +7,13 @@ class BranchPredictor: public Module {
     private:
         // initialize state to weakly taken
         BranchPredictionType currentState = BranchPredictionType::WEAK_TAKEN;
+        const bool debugMode;
     public:
         int getBranchPrediction();
         void updateState(bool inpIsCorrect);
-    BranchPredictor();
+    BranchPredictor(
+        const bool debugMode
+    );
     ~BranchPredictor() {};
 };
 

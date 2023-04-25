@@ -10,6 +10,7 @@ class Fetch: public Stage {
         int & programCounter;
         unordered_map<int, pair<int, int>> & btb;
         const int nf;
+        const bool debugMode;
     public:
         bool dispatch();
     Fetch(
@@ -17,7 +18,8 @@ class Fetch: public Stage {
         deque<Instruction> & fInstructionQueue,
         int & programCounter,
         unordered_map<int, pair<int, int>> & btb,
-        const int nf
+        const int nf,
+        const bool debugMode
     );
     ~Fetch();
 };

@@ -9,9 +9,10 @@ Decode::Decode(
     deque<unordered_map<string, string>> & mappingTableHistory,
     deque<deque<string>> & freeListHistory,
     unordered_map<string, int> & branchLabelsTable,
-    BranchPredictor & dbp,
+    BranchPredictor * dbp,
     const int nf,
-    const int ni
+    const int ni,
+    const bool debugMode
 ) :
     fInstructionQueue(fInstructionQueue),
     btb(btb),
@@ -23,13 +24,15 @@ Decode::Decode(
     branchLabelsTable(branchLabelsTable),
     dbp(dbp),
     nf(nf),
-    ni(ni)
+    ni(ni),
+    debugMode(debugMode)
 {
     this->stageType = StageType::DECODE;
-    printStageType();
-    cout << "\nNF in Decode stage = " << nf << "\n"
-        << "\nNI in Decode stage = " << ni << "\n";
-    cout << "\n";
+    if (debugMode) {
+        printStageType();
+        cout << "\nNF in Decode stage = " << nf << "\n"
+            << "\nNI in Decode stage = " << ni << "\n";
+    }
 };
 
 string Decode::performRegisterRenaming(string inpRegName, bool isDestinationReg) {
@@ -224,7 +227,7 @@ bool Decode::dispatch() {
                     // current instruction is not contained in btb
                     btb[iInstr.address] = {
                         branchLabelsTable[iInstr.rt],
-                        dbp.getBranchPrediction()
+                        dbp->getBranchPrediction()
                     };
                 }
             }

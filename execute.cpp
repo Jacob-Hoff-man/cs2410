@@ -13,7 +13,7 @@ Execute::Execute(
     unordered_map<string, double> & physicalRegs,
     unordered_map<int, double> & memories,
     deque<string> & freeList,
-    BranchPredictor & dbp,
+    BranchPredictor * dbp,
     int & programCounter,
     unordered_map<int, pair<int, int>> & btb,
     unordered_map<string, string> & mappingTable,
@@ -23,7 +23,8 @@ Execute::Execute(
     deque<Instruction> & dInstructionQueue,
     const int nw,
     const int nr,
-    const int nb
+    const int nb,
+    const bool debugMode
 ) :
     rsUnitInt(rsUnitInt),
     rsUnitLoad(rsUnitLoad),
@@ -47,14 +48,17 @@ Execute::Execute(
     dInstructionQueue(dInstructionQueue),
     nw(nw),
     nr(nr),
-    nb(nb)
+    nb(nb),
+    debugMode(debugMode)
 {
     this->stageType = StageType::EXECUTE;
-    printStageType();
-    cout << "\nNW in Execute stage = " << nw <<
-        "\nNR in Execute stage = " << nr <<
-        "\nNB in Execute stage = " << nb <<
-        "\n";
+    if (debugMode) {
+        printStageType();
+        cout << "\nNW in Execute stage = " << nw <<
+            "\nNR in Execute stage = " << nr <<
+            "\nNB in Execute stage = " << nb <<
+            "\n";
+    }
 };
 
 RSStatus Execute::getReservationStationFromInstruction(
@@ -188,28 +192,23 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
         inpEntry.instruction.opcode != InstructionType::ADDI &&
         inpEntry.instruction.opcode != InstructionType::FLD
     ) {
-        if (inpEntry.instruction.rt == "loop") {
-            cout << "ALU SEES instruction.rt AS 'LOOP' \n";
-            cout << inpEntry.instruction.rt << "\n";
-        }
-        // TODO: FIX USING BRANCH TABLE
-        if (inpEntry.instruction.rt == ZERO_REGISTER_NAME) newVk = 0;
-        else if (inpEntry.instruction.opcode == InstructionType::BNE) {
-                if (inpEntry.instruction.opcode == InstructionType::BNE) {
-                     cout << "\nBNE NEW VK (rd = " << inpEntry.instruction.rd << ") count = " << physicalRegs.count(inpEntry.instruction.rd) << " val = " << physicalRegs[inpEntry.instruction.rd];
-                }
+        if (inpEntry.instruction.rt == ZERO_REGISTER_NAME) 
+            newVk = 0;
+        else if (inpEntry.instruction.opcode == InstructionType::BNE)
             newVk = physicalRegs[inpEntry.instruction.rd];
-        }
-        else newVk = physicalRegs[inpEntry.instruction.rt];
+        else 
+            newVk = physicalRegs[inpEntry.instruction.rt];
     }
 
-    cout << "PERFORMING ALU FOR=\n";
-    printROBStatus(inpEntry);
-    printRSStatus(inpRs);
+    if (debugMode) {
+        cout << "PERFORMING ALU FOR=\n";
+        printROBStatus(inpEntry);
+        printRSStatus(inpRs);
+    }
 
     switch (inpEntry.instruction.opcode) {
         case InstructionType::FLD: {
-            cout << "\nFLD alu hit (memories key = Vj + imm)= " <<
+            if (debugMode) cout << "\nFLD alu hit (memories key = Vj + imm)= " <<
                 newVj <<
                 " + " <<
                 inpEntry.instruction.immediate <<
@@ -219,7 +218,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return memories[newVj + inpEntry.instruction.immediate];
         }
         case InstructionType::FSD: {
-            cout << "\nFSD alu hit (val = Vk + imm)= " <<
+            if (debugMode) cout << "\nFSD alu hit (val = Vk + imm)= " <<
                 newVk <<
                 " + " <<
                 inpEntry.instruction.immediate <<
@@ -228,7 +227,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return newVk + inpEntry.instruction.immediate;
         }
         case InstructionType::ADD: {
-            cout << "\nADD alu hit (val = Vj + Vk)= " <<
+            if (debugMode) cout << "\nADD alu hit (val = Vj + Vk)= " <<
                 newVj <<
                 " + " <<
                 newVk <<
@@ -237,7 +236,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return (int)(newVj + newVk);
         }
         case InstructionType::ADDI: {
-            cout << "\nADDI alu hit (val = Vj + imm)= " <<
+            if (debugMode) cout << "\nADDI alu hit (val = Vj + imm)= " <<
                 newVj <<
                 " + " <<
                 inpEntry.instruction.immediate <<
@@ -246,7 +245,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return newVj + inpEntry.instruction.immediate;
         }
         case InstructionType::SLT: {
-            cout << "\nSLT alu hit (val = Vj < Vk)= " <<
+            if (debugMode) cout << "\nSLT alu hit (val = Vj < Vk)= " <<
                 newVj <<
                 " < " <<
                 newVk <<
@@ -255,7 +254,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return newVj < newVk; // double val returned as 0(false) or 1(true)
         }
         case InstructionType::FADD: {
-            cout << "\nFADD alu hit (val = Vj + Vk)= " <<
+            if (debugMode) cout << "\nFADD alu hit (val = Vj + Vk)= " <<
                 newVj <<
                 " + " <<
                 newVk <<
@@ -264,7 +263,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return newVj + newVk;
         }
         case InstructionType::FSUB: {
-            cout << "\nFSUB alu hit (val = Vj - Vk)= " <<
+            if (debugMode) cout << "\nFSUB alu hit (val = Vj - Vk)= " <<
                 newVj <<
                 " - " <<
                 newVk <<
@@ -273,7 +272,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return newVj - newVk;
         }
         case InstructionType::FMUL: {
-            cout << "\nFMUL alu hit (val = Vj * Vk)= " <<
+            if (debugMode) cout << "\nFMUL alu hit (val = Vj * Vk)= " <<
                 newVj <<
                 " * " <<
                 newVk <<
@@ -282,7 +281,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return newVj * newVk;
         }
         case InstructionType::FDIV: {
-            cout << "\nFDIV alu hit (val = Vj / Vk)= " <<
+            if (debugMode) cout << "\nFDIV alu hit (val = Vj / Vk)= " <<
                 newVj <<
                 " / " <<
                 newVk <<
@@ -291,7 +290,7 @@ double Execute::alu(ROBStatus inpEntry, RSStatus inpRs) {
             return newVj / newVk;
         }
         case InstructionType::BNE: {
-            cout << "\nBNE alu hit (val = Vj != Vk)= " <<
+            if (debugMode) cout << "\nBNE alu hit (val = Vj != Vk)= " <<
                 newVj <<
                 " != " <<
                 newVk <<
@@ -350,9 +349,9 @@ bool Execute::dispatch() {
                             }
                             if (btb[entry.instruction.address].second != entry.value) {
                                 // branch prediction was wrong, need to update branch predictor state and flush
-                                cout << "\nINVALID BRANCH PREDICTION, FLUSHING PIPELINE\n";
+                                if (debugMode) cout << "\nINVALID BRANCH PREDICTION, FLUSHING PIPELINE\n";
                                 // update branch predictor state
-                                dbp.updateState(false);
+                                dbp->updateState(false);
                                 // flush pipeline
                                 btb[entry.instruction.address].second = entry.value;
                                 dInstructionQueue.clear();
@@ -386,8 +385,8 @@ bool Execute::dispatch() {
                             if (entry.instruction.opcode != InstructionType::FSD) cdb[entry.instruction.rd] = entry.value;
                             else {
                                 // stall!
-                                cout << "\nstall e instead of storing FSD instr onto CDB (rs name=" << getRSNameFromInstructionType(entry.instruction.opcode) << ")\n";
-                                return false;
+                                if (debugMode) cout << "\nstall e instead of storing FSD instr onto CDB (rs name=" << getRSNameFromInstructionType(entry.instruction.opcode) << ")\n";
+                                return true;
                             }
 
                         }

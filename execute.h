@@ -31,7 +31,8 @@ class Execute: public Stage {
         unordered_map<string, double> & physicalRegs;
         unordered_map<int, double> & memories;
         deque<string> & freeList;
-        BranchPredictor & dbp;
+        // branch prediction and flush
+        BranchPredictor * dbp;
         int & programCounter;
         unordered_map<int, pair<int, int>> & btb;
         unordered_map<string, string> & mappingTable;
@@ -42,6 +43,7 @@ class Execute: public Stage {
         const int nw;
         const int nr;
         const int nb;
+        const bool debugMode;
         int getLatencyFromRSName(string inpName){
             if (inpName == "LOAD") return LOAD_LATENCY;
             else if (inpName == "STORE") return STORE_LATENCY;
@@ -76,7 +78,7 @@ class Execute: public Stage {
         unordered_map<string, double> & physicalRegs,
         unordered_map<int, double> & memories,
         deque<string> & freeList,
-        BranchPredictor & dbp,
+        BranchPredictor * dbp,
         int & programCounter,
         unordered_map<int, pair<int, int>> & btb,
         unordered_map<string, string> & mappingTable,
@@ -86,7 +88,8 @@ class Execute: public Stage {
         deque<Instruction> & dInstructionQueue,
         const int nw,
         const int nr,
-        const int nb
+        const int nb,
+        const bool debugMode
     );
     ~Execute();
 };

@@ -2,7 +2,6 @@
 
 int main(int argc, char *argv[])
 {
-    cout << "\n\nhello world\n";
     if (argc == 7) {
         const string inpFileName = argv[1];
         const int nf = stoi(argv[2]);
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
         "\n DEBUGMODE=" << debugMode <<
         "\n";
 
-        cout << "INIT SIMULATOR AND RUN readInputFile(" << inpFileName.c_str() << ")\n";
+        if (debugMode) cout << "INIT SIMULATOR AND RUN readInputFile(" << inpFileName.c_str() << ")\n";
         Simulator * simulator = new Simulator(inpFileName, nf, ni, nw, nb, nr, true);
         simulator->execute();
     } else {
