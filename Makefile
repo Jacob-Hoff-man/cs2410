@@ -6,7 +6,7 @@ NF=4 # number of instructions fetched per cycle by the fetch unit
 NI=16 # instruction queue max capacity of instructions held in the decode unit
 NW=4 # number of instructions issued per cycle to reservation stations
 NB=4 # number of common data buses
-NR=16 # number of entries available in the circular reorder buffer (ROB)
+NR=8 # number of entries available in the circular reorder buffer (ROB)
 
 all: main
 

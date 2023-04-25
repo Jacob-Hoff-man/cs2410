@@ -265,7 +265,7 @@ void Simulator::cyclePipeline() {
     if (!i->dispatch()) iStallCount++;
     if (!d->dispatch()) dStallCount++;
     if (!f->dispatch()) fStallCount++;
-    tickCycleCount();
+    tickCycleCount(true);
     if (debugMode) {
         cout << "\nPOST CYCLE RESULTS\n";
         // debug per cycle
@@ -311,6 +311,9 @@ void Simulator::execute() {
     while (fInstructionQueue.size() > 0 || dInstructionQueue.size() > 0 || rob.size() > 0);
     cout << "\ndone\n\nPOST EXECUTE RESULTS:\n";
     // debug post execution
+    // reverse false cycleCount increment
+    tickCycleCount(false); // decrement
+    printSimulatorCurrentCycleCount();
     printSimulatorMemories();
     // printSimulatorDecodeInstructionQueue();
     // printSimulatorBranchLabelsTable();

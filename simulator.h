@@ -68,9 +68,11 @@ class Simulator {
         int getInstructionsSize() {
             return instructions.size();
         }
-        void tickCycleCount() {
-            cycleCount++;
+        void tickCycleCount(bool isPositive) {
+            if (isPositive) cycleCount++;
+            else cycleCount--;
         }
+
         void cyclePipeline();
         void cyclePipeline(int cycles);
         void execute();
