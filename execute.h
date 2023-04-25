@@ -3,6 +3,7 @@
 
 #include "stage.h"
 #include "branchPredictor.h"
+#include "alu.h"
 
 #define INT_LATENCY 1
 #define LOAD_LATENCY 1
@@ -44,6 +45,8 @@ class Execute: public Stage {
         const int nr;
         const int nb;
         const bool debugMode;
+        // alu module
+        Alu * alu;
         int getLatencyFromRSName(string inpName){
             if (inpName == "LOAD") return LOAD_LATENCY;
             else if (inpName == "STORE") return STORE_LATENCY;
@@ -62,7 +65,7 @@ class Execute: public Stage {
         void updateReservationStation(ROBStatus inpEntry, RSStatus inpRs);
         void updateAllReservationStationsUsingEntry(ROBStatus inpEntry, vector<RSStatus> & inpRsUnit);
         void removeReservationStation(ROBStatus inpEntry, RSStatus inpRs);
-        double alu(ROBStatus inpEntry, RSStatus inpRs);
+        // double alu(ROBStatus inpEntry, RSStatus inpRs);
     public:
         bool dispatch();
     Execute(

@@ -9,13 +9,14 @@ NB=4 # number of common data buses
 NR=16 # number of entries available in the circular reorder buffer (ROB)
 
 all: main
+
 debug:
 	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NB) $(NR) 1
 run: 
 	./main $(INP_FILE_NAME) $(NF) $(NI) $(NW) $(NB) $(NR)
 
-main: common.o main.o simulator.o branchPredictor.o fetch.o decode.o issue.o execute.o
-	$(CC) -o main common.o main.o simulator.o branchPredictor.o fetch.o decode.o issue.o execute.o
+main: common.o main.o simulator.o branchPredictor.o alu.o fetch.o decode.o issue.o execute.o
+	$(CC) -o main common.o main.o simulator.o branchPredictor.o alu.o fetch.o decode.o issue.o execute.o
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -28,6 +29,9 @@ simulator.o: simulator.cpp
 
 branchPredictor.o: branchPredictor.cpp
 	$(CC) $(CFLAGS) branchPredictor.cpp
+
+alu.o: alu.cpp
+	$(CC) $(CFLAGS) alu.cpp
 
 fetch.o: fetch.cpp
 	$(CC) $(CFLAGS) fetch.cpp

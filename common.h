@@ -52,7 +52,8 @@ enum InstructionStatusType {
 };
 
 enum ModuleType {
-    BRANCH_PREDICTOR
+    BRANCH_PREDICTOR,
+    ALU
 };
 
 // structs
