@@ -65,7 +65,6 @@ class Execute: public Stage {
         void updateReservationStation(ROBStatus inpEntry, RSStatus inpRs);
         void updateAllReservationStationsUsingEntry(ROBStatus inpEntry, vector<RSStatus> & inpRsUnit);
         void removeReservationStation(ROBStatus inpEntry, RSStatus inpRs);
-        // double alu(ROBStatus inpEntry, RSStatus inpRs);
     public:
         bool dispatch();
     Execute(

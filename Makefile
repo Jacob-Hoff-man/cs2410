@@ -3,7 +3,7 @@ CFLAGS = -std=c++11 -c -Wall -pedantic -g
 # input parameters - taken from project.pdf
 INP_FILE_NAME="prog.dat"
 NF=4 # number of instructions fetched per cycle by the fetch unit
-NI=16 # instuction queue max capacity of instructions held in the decode unit
+NI=16 # instruction queue max capacity of instructions held in the decode unit
 NW=4 # number of instructions issued per cycle to reservation stations
 NB=4 # number of common data buses
 NR=16 # number of entries available in the circular reorder buffer (ROB)
