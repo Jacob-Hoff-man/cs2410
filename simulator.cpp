@@ -266,14 +266,11 @@ void Simulator::cyclePipeline() {
     if (!d->dispatch()) dStallCount++;
     if (!f->dispatch()) fStallCount++;
     tickCycleCount();
-}
-
-void Simulator::cyclePipeline(int cycles) {
-    for (int i = 0; i < cycles; i++) {
-        cyclePipeline();
+    if (debugMode) {
+        cout << "\nPOST CYCLE RESULTS\n";
         // debug per cycle
         // printSimulatorMemories();
-        // printSimulatorDecodeInstructionQueue();
+        printSimulatorDecodeInstructionQueue();
         // printSimulatorBranchLabelsTable();
         // printSimulatorBtbMap();
         // printSimulatorPhysicalRegs();
@@ -281,9 +278,30 @@ void Simulator::cyclePipeline(int cycles) {
         // printSimulatorFreeList();
         // printSimulatorMappingTableHistory();
         // printSimulatorFreeListHistory();
-        // printSimulatorReservationStations();
-        // printSimulatorROB();
+        printSimulatorReservationStations();
+        printSimulatorROB();
         // printSimulatorStallCounts();
+    }
+}
+
+void Simulator::cyclePipeline(int cycles) {
+    for (int i = 0; i < cycles; i++) {
+        cyclePipeline();
+        if (debugMode) {
+            // debug per cycle
+            // printSimulatorMemories();
+            // printSimulatorDecodeInstructionQueue();
+            // printSimulatorBranchLabelsTable();
+            // printSimulatorBtbMap();
+            // printSimulatorPhysicalRegs();
+            // printSimulatorMappingTable();
+            // printSimulatorFreeList();
+            // printSimulatorMappingTableHistory();
+            // printSimulatorFreeListHistory();
+            // printSimulatorReservationStations();
+            // printSimulatorROB();
+            // printSimulatorStallCounts();
+        }
     }
 }
 
@@ -291,7 +309,7 @@ void Simulator::execute() {
     cout << "\nstart\n";
     do cyclePipeline();
     while (fInstructionQueue.size() > 0 || dInstructionQueue.size() > 0 || rob.size() > 0);
-    cout << "\ndone\n";
+    cout << "\ndone\n\nPOST EXECUTE RESULTS:\n";
     // debug post execution
     printSimulatorMemories();
     // printSimulatorDecodeInstructionQueue();
