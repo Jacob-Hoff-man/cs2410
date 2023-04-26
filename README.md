@@ -98,3 +98,5 @@ Simulator::execute (`simulator.cpp` line 308):
        printSimulatorStallCounts();
   ...
 ```
+
+**The [project report](https://github.com/Jacob-Hoff-man/cs2410/blob/main/Project%20Final%20Report%20Jacob%20Hoffman.pdf) is available for more details.**
