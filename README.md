@@ -1,7 +1,8 @@
 # CS2410 Computer Architecture
-
-
 ### Out-Of-Order Execution CPU Simulator Using Tomasulo Algorithm and Speculation
+### The [project report](https://github.com/Jacob-Hoff-man/cs2410/blob/main/Project%20Final%20Report%20Jacob%20Hoffman.pdf) is available for more details.
+
+
 
 #### How To Run:
 
@@ -99,4 +100,17 @@ Simulator::execute (`simulator.cpp` line 308):
   ...
 ```
 
-**The [project report](https://github.com/Jacob-Hoff-man/cs2410/blob/main/Project%20Final%20Report%20Jacob%20Hoffman.pdf) is available for more details.**
+
+
+#### Next Steps:
+
+1. Implement pipelined FPAdd and FPMul ALU execution.
+2. Refactor the branch predictor functionality to store in the branch target buffer using bits 7-4 of the hashed branch address being stored.
+3. Parameterize many variables across the program:
+- `common.h`: REGISTER_COUNT
+- `decode.h`: BTB_ENTRIES_COUNT
+- `issue.h`: RS_COUNT_INT, RS_COUNT_LOAD, RS_COUNT_STORE, RS_COUNT_FPADD, RS_COUNT_FPMULT, RS_COUNT_FPDIV, RS_COUNT_BU
+- `execute.h`: INT_LATENCY, LOAD_LATENCY, STORE_LATENCY, FPADD_LATENCY, FPMULT_LATENCY, FPDIV_LATENCY, BU_LATENCY, FPADD_IS_PIPELINED, FPMULT_IS_PIPELINED, FPDIV_IS_PIPELINED
+4. Develop a GUI using [Qt framework](https://doc.qt.io/qt-6/gettingstarted.html).
+
+
