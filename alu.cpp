@@ -16,7 +16,7 @@ Alu::Alu(
 
 // perform operation based on InstructionType
 double Alu::performOperation(ROBStatus inpEntry, RSStatus inpRs) {
-double newVj;
+    double newVj;
     if (cdb.count(inpRs.vj)) newVj = cdb[inpRs.vj];
     else newVj = physicalRegs[inpRs.vj];
     double newVk;
